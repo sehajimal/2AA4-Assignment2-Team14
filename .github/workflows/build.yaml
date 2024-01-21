@@ -27,5 +27,19 @@ jobs:
       - name: Create project jar with Maven
         run: mvn clean package -DskipTests
 
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{env.JAVA_ENV_VERSION}}
+          distribution: 'adopt'
+          cache: 'maven'
+
       - name: running tests
         run: mvn test
