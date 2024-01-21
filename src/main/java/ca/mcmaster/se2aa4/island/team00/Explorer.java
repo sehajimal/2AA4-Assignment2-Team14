@@ -15,20 +15,22 @@ public class Explorer implements IExplorerRaid {
     @Override
     public void initialize(String s) {
         logger.info("** Initializing the Exploration Command Center");
+        JSONObject response = new JSONObject(new JSONTokener(new StringReader(s)));
+        logger.info("** Contract:\n"+response.toString(2));
     }
 
     @Override
     public String takeDecision() {
         JSONObject decision = new JSONObject();
         decision.put("action", "stop"); // we stop the exploration immediately
-        logger.trace("** Decision: " + decision.toString());
+        logger.info("** Decision: " + decision.toString());
         return decision.toString();
     }
 
     @Override
     public void acknowledgeResults(String s) {
         JSONObject response = new JSONObject(new JSONTokener(new StringReader(s)));
-        logger.trace("** Response received:\n"+response.toString(2));
+        logger.info("** Response received:\n"+response.toString(2));
     }
 
     @Override
