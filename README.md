@@ -1,7 +1,7 @@
 # [A2] Island ca.mcmaster.se2aa4.island.team00.Explorer
 
 - Authors:
-  - [Firstname_1, Lastname_1](macid@mcmaster.ca)
+  - [Firstname_1, Lastname_1](macid@mcmaster.ca) 
   - [Firstname_2, Lastname_2](macid@mcmaster.ca)
   - [Firstname_3, Lastname_3](macid@mcmaster.ca)
 
@@ -9,7 +9,7 @@
 
 This product is an _exploration command center_ for the [Island](https://ace-design.github.io/island/) serious game. 
 
-- The `ca.mcmaster.se2aa4.island.team_XX_.Explorer` class implements the command center, used to compete with the others. (CC being the team identifier)
+- The `ca.mcmaster.se2aa4.island.team_XXX_.Explorer` class implements the command center, used to compete with the others. (XXX being the team identifier)
 - The `Runner` class allows one to run the command center on a specific map.
 
 ### Strategy description
@@ -56,4 +56,4 @@ It creates three files in the `outputs` directory:
 
 Each week, you'll have to `tag` the version you want to submit for the competition. This version will be used in the weekly run. No tag means no competition.
 
-The tag syntax is `champion_XX`, with `XX` the week number. So your champion for the first week will be tagged `champion_01`.
+The tag syntax is `wX`, with `X` the week number. So your product for the first week will be tagged `w1`.

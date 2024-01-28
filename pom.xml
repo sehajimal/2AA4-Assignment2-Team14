@@ -5,12 +5,12 @@
   http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- 
-    Replace the `00` with your team identifier, using 2 digits. 
-    If you're team 1,  use team-01 ;
-    If you're team 42, use team-42 . You got the idea!
+    Replace the `XXX` with your team identifier, using 2 digits.
+    If you're team 201,  use team201 ;
+    If you're team 542, use team542 . You got the idea!
   -->
   
-  <artifactId>team00</artifactId>
+  <artifactId>teamXXX</artifactId>
 
   <!-- Don't edit the POM file below this line. Ask instructor if you need to (you should not need it) -->
 
