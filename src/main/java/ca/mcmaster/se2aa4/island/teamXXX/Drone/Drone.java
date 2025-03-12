@@ -13,7 +13,6 @@ public class Drone {
     private final Map<Directions, Directions> goingRight;
     private final Map<Directions, Directions> goingLeft;
     private final Map<Directions, int[]> moveForward;
-    private final Map<Directions, Directions> invalidMoves;
 
     public Drone(Integer amount, String starting) {
         this.battery = new Battery(amount);
@@ -39,12 +38,6 @@ public class Drone {
         this.moveForward.put(Directions.S, new int[]{0, -1});
         this.moveForward.put(Directions.E, new int[]{1, 0});
         this.moveForward.put(Directions.W, new int[]{-1, 0});
-
-        this.invalidMoves = new EnumMap<>(Directions.class);
-        this.invalidMoves.put(Directions.N, Directions.S);
-        this.invalidMoves.put(Directions.S, Directions.N);
-        this.invalidMoves.put(Directions.E, Directions.W);
-        this.invalidMoves.put(Directions.W, Directions.E);
     }
 
     public void updateCoordinates() {
@@ -55,10 +48,6 @@ public class Drone {
 
     // moves the drone once forward in current heading, then once in new heading
     public void updateHeading(Directions direction) {
-        if (invalidMoves.get(this.heading) == direction) {
-            System.out.println("Invalid move: Cannot make a 180-degree turn.");
-            return; // ignore invalid move
-        }
         updateCoordinates();
         this.heading = direction;
         updateCoordinates();
