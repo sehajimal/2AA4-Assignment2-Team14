@@ -10,7 +10,7 @@
     If you're team 542, use team542 . You got the idea!
   -->
   
-  <artifactId>team14</artifactId>
+  <artifactId>teamXXX</artifactId>
 
   <!-- Don't edit the POM file below this line. Ask instructor if you need to (you should not need it) -->
 
@@ -25,8 +25,8 @@
   <properties>
     <mainClass>ca.mcmaster.se2aa4.island.${project.artifactId}.Runner</mainClass>
     <timeout>2000</timeout>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
