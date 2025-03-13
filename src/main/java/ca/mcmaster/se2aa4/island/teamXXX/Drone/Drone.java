@@ -11,10 +11,12 @@ public class Drone extends ExplorerSubject implements Movable {
     private Battery battery;
     private int x;
     private int y;
+    private int costPerMove;
     private Actions actions = new Actions();
 
     public Drone(Integer amount, String starting) {
         this.battery = new Battery(amount);
+        this.costPerMove = costPerMove;
         try {
             this.heading = Directions.valueOf(starting);
         } catch (Exception e) {
@@ -68,6 +70,20 @@ public class Drone extends ExplorerSubject implements Movable {
     public void stop() {
         update(actions.stop());
     }
+
+    public void returnHome() {
+        System.out.println("Return home in progress... Battery levels low!");
+        while (x > 0) {
+            x--;
+            battery.useBattery(costPerMove);
+        }
+        while (y > 0) {
+            y--;
+            battery.useBattery(costPerMove);
+        }
+        stop();
+    }
+
     
     @Override
     public int getBatteryLevel() {
