@@ -4,6 +4,7 @@ import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ExplorerSubject;
 import java.util.EnumMap;
 import java.util.Map;
+import org.json.JSONObject;
 
 public class Drone extends ExplorerSubject {
 
@@ -11,6 +12,7 @@ public class Drone extends ExplorerSubject {
     private Battery battery;
     private int x;
     private int y;
+    private Actions actions = new Actions();
     private final Map<Directions, Directions> goingRight;
     private final Map<Directions, Directions> goingLeft;
     private final Map<Directions, int[]> moveForward;
@@ -41,10 +43,18 @@ public class Drone extends ExplorerSubject {
         this.moveForward.put(Directions.W, new int[]{-1, 0});
     }
 
-    public void updateCoordinates() {
+    private void updateCoordinates() {
         int[] move = moveForward.get(this.heading);
         this.x += move[0];
         this.y += move[1];
+    }
+
+    public void moveForward() {
+        int[] move = moveForward.get(this.heading);
+        this.x += move[0];
+        this.y += move[1];
+
+        update(actions.fly());
     }
 
     // moves the drone once forward in current heading, then once in new heading
@@ -52,6 +62,12 @@ public class Drone extends ExplorerSubject {
         updateCoordinates();
         this.heading = direction;
         updateCoordinates();
+
+        update(actions.heading(direction));
+    }
+
+    public void stop() {
+        update(actions.stop());
     }
     
     public int getBatteryLevel() {

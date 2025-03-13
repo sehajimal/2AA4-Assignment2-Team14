@@ -34,17 +34,32 @@ public class DroneLimits {
         this.invalidMoves.put(Directions.W, Directions.E);
     }
 
-     public void commandValidator(Actions action, Directions newDirection, JSONObject parameter) {
-        if (newDirection == this.drone.getHeading()) {
-            logger.info("Currently going in right direction, continuing exploration");
-        } else {
-            if (invalidMoves.get(this.drone.getHeading()) == newDirection) {
-                logger.error("Invalid move: Cannot make a 180-degree turn.");
-                return;
-            } else {
-                //action.heading(parameter, newDirection, drone);
-            }
-        }
+    //  public void commandValidator(Actions action, Directions newDirection, JSONObject parameter) {
+    //     if (newDirection == this.drone.getHeading()) {
+    //         logger.info("Currently going in right direction, continuing exploration");
+    //     } else {
+    //         if (invalidMoves.get(this.drone.getHeading()) == newDirection) {
+    //             logger.error("Invalid move: Cannot make a 180-degree turn.");
+    //             return;
+    //         } else {
+    //             //action.heading(parameter, newDirection, drone);
+    //         }
+    //     }
+    // }
+
+    public boolean is180turn(Directions currHeading, Directions newHeading) {
+        return !(invalidMoves.get(currHeading) == newHeading);
     }
+
+    // indicates if we must return to base now
+    public boolean sufficientBattery(int x, int y, int batteryLevel, int cost) {
+
+        if ((x + y) * cost + cost < batteryLevel) {
+            return true;
+        }
+        return false;
+    }
+
+    //? for going home, can check if battery is below 50% of original level
 
 }
