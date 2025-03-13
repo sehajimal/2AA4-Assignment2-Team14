@@ -30,4 +30,20 @@ public class DroneController {
         this.commandTracker = new CommandTracker(subjects);
     }
 
+    private void turnRight() {
+        drone.turnRight();
+    }
+
+    private void turnLeft() {
+        drone.turnLeft();
+    }
+
+    private void stop() {
+        drone.stop();
+    }
+
+    private void fly() {
+        drone.moveForward();
+    }
+
 }

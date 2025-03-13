@@ -35,20 +35,23 @@ public class Explorer implements IExplorerRaid {
     public String takeDecision() {
         JSONObject decision = new JSONObject();
         //decision.put("action", "stop"); // we stop the exploration immediately
-        // if (i % 2 == 0) {
-        //     decision.put("action", "fly");
-        // }
-        // else {
-        //     JSONObject parameter = new JSONObject();
-        //     decision.put("action", "scan");
-        //     parameter.put("direction", Directions.N);
-        //     decision.put("parameters", parameter);
-        // }
-        // i++;
-        // JSONObject parameter = new JSONObject();
-        JSONObject parameter = new JSONObject();
+        if (i % 2 == 0 && i < 10) {
+            decision.put("action", "fly");
+        }
+        else if (i < 10) {
+            //JSONObject parameter = new JSONObject();
+            decision.put("action", "scan");
+            //parameter.put("direction", Directions.N);
+            //decision.put("parameters", parameter);
+        }
+        else {
+            decision.put("action", "stop");
+        }
+        i++;
+        //JSONObject parameter = new JSONObject();
+        //JSONObject parameter = new JSONObject();
 
-        decision.put("action", "scan");
+        //decision.put("action", "scan");
         // parameter.put("direction", Directions.N);
         // decision.put("parameters", parameter);
         
