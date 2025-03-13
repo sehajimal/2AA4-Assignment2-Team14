@@ -10,6 +10,8 @@ import java.util.List;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.DroneLimits;
+import ca.mcmaster.se2aa4.island.teamXXX.Map.State;
+
 
 public class DroneController {
 
@@ -19,6 +21,7 @@ public class DroneController {
     private Radar radar;
     //! can refactor to not hold the drone
     private DroneLimits limitations;
+    private State currentState;
 
     public DroneController(String heading, int batteryLevel) {
 
