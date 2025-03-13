@@ -35,6 +35,7 @@ public class Explorer implements IExplorerRaid {
     public String takeDecision() {
         JSONObject decision = new JSONObject();
         //decision.put("action", "stop"); // we stop the exploration immediately
+<<<<<<< HEAD
         if (i % 2 == 0 && i < 10) {
             decision.put("action", "fly");
         }
