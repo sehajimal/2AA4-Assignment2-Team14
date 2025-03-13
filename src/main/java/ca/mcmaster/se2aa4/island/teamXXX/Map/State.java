@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 public abstract class State {
 
-    private Drone drone;
+    protected Drone drone;
 
     public State(Drone drone) {
         this.drone = drone;
