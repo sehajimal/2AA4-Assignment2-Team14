@@ -5,7 +5,17 @@ import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 
 public class Actions {
 
+    public JSONObject fly() {
+        JSONObject decision = new JSONObject();
+        decision.put("action", "fly");
+        return decision;
+    }
 
+    public JSONObject scan() {
+        JSONObject decision = new JSONObject();
+        decision.put("action", "scan");
+        return decision;
+    }
 
     public JSONObject echo(Directions direction) {
         JSONObject decision = new JSONObject();
