@@ -7,6 +7,10 @@ public abstract class State {
 
     private Drone drone;
 
+    public State(Drone drone) {
+        this.drone = drone;
+    }
+
     public abstract State getNextState(JSONObject response);
     
 }
