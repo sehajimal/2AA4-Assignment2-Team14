@@ -17,16 +17,15 @@ public class TurnDrone extends State {
         leftTurn = false;
     }
 
-    //! update to return a new searcher state
     @Override
     public State getNextState(JSONObject response) {
         if (rightTurn) {
             drone.turnRight();
-            //return new Searcher(this.drone);
+            return new Searcher(this.drone);
         } else if (leftTurn) {
             drone.turnLeft();
-            //return new Searcher(this.drone);
-        } if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) {
+            return new Searcher(this.drone);
+        } else if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) {
             rightTurn = true;
             drone.turnRight();
             return this;
