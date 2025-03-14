@@ -11,6 +11,7 @@ import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.DroneLimits;
 import ca.mcmaster.se2aa4.island.teamXXX.Map.State;
+import org.json.JSONObject;
 
 
 public class DroneController {
@@ -22,7 +23,9 @@ public class DroneController {
     //! can refactor to not hold the drone
     private DroneLimits limitations;
     private State currentState;
+    private JSONObject latestResult;
 
+    //! update constructor to initialize state to be findIsland
     public DroneController(String heading, int batteryLevel) {
 
         this.drone = new Drone(batteryLevel, heading);
@@ -33,20 +36,12 @@ public class DroneController {
         this.commandTracker = new CommandTracker(subjects);
     }
 
-    private void turnRight() {
-        drone.turnRight();
+    public JSONObject makeDecision(){
+        this.currentState.getNextState(this.latestResult);
+        return commandTracker.getLatestCommand();
     }
 
-    private void turnLeft() {
-        drone.turnLeft();
+    public void setResult(JSONObject result) {
+        this.latestResult = result;
     }
-
-    private void stop() {
-        drone.stop();
-    }
-
-    private void fly() {
-        drone.moveForward();
-    }
-
 }

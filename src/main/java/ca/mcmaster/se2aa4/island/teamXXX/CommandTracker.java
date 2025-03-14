@@ -1,6 +1,7 @@
 package ca.mcmaster.se2aa4.island.teamXXX;
 
 import java.util.Queue;
+import java.util.Deque;
 import java.util.LinkedList;
 import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.CommandObserver;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class CommandTracker implements CommandObserver {
 
-    private Queue<JSONObject> commands = new LinkedList<>();
+    private Deque<JSONObject> commands = new LinkedList<>();
 
     public CommandTracker(List<ExplorerSubject> subjects) {
         for (ExplorerSubject subject : subjects) {
@@ -20,7 +21,12 @@ public class CommandTracker implements CommandObserver {
     // observes the drone and the radar, upon calling whatever decision is made will be added to the queue
     @Override
     public void addCommand(JSONObject decision) {
-        commands.add(decision);
+        commands.push(decision);
     }
-    
+
+    // returns latest command
+    @Override
+    public JSONObject getLatestCommand() {
+        return commands.peek();
+    }
 }

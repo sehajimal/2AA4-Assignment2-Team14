@@ -5,5 +5,7 @@ import org.json.JSONObject;
 public interface CommandObserver {
 
     public void addCommand(JSONObject decision);
+
+    public JSONObject getLatestCommand();
     
 }

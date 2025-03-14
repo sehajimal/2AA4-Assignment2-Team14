@@ -13,7 +13,8 @@ import org.json.JSONTokener;
 public class Explorer implements IExplorerRaid {
 
     private final Logger logger = LogManager.getLogger();
-    private int i = 0;
+    private DroneController droneController;
+    int i = 0;
 
     @Override
     public void initialize(String s) {
@@ -28,23 +29,26 @@ public class Explorer implements IExplorerRaid {
         logger.info("Battery level is {}", batteryLevel);
         System.out.println(info);
 
+        droneController = new DroneController(direction, batteryLevel);
+
         // initialize DroneController here (send in battery level and heading)
     }
 
     @Override
     public String takeDecision() {
-        JSONObject decision = new JSONObject();
+        JSONObject decision = droneController.makeDecision();
+        //JSONObject decision = new JSONObject();
         //decision.put("action", "stop"); // we stop the exploration immediately
-        if (i % 2 == 0) {
-            decision.put("action", "fly");
-        }
-        else {
-            JSONObject parameter = new JSONObject();
-            decision.put("action", "scan");
-            parameter.put("direction", Directions.N);
-            decision.put("parameters", parameter);
-        }
-        i++;
+        // if (i % 2 == 0) {
+        //     decision.put("action", "fly");
+        // }
+        // else {
+        //     JSONObject parameter = new JSONObject();
+        //     decision.put("action", "scan");
+        //     parameter.put("direction", Directions.N);
+        //     decision.put("parameters", parameter);
+        // }
+        // i++;
         // JSONObject parameter = new JSONObject();
         // JSONObject parameter = new JSONObject();
 
@@ -54,6 +58,9 @@ public class Explorer implements IExplorerRaid {
         // decision.put("parameters", parameter);
         
         logger.info("** Decision: {}",decision.toString());
+
+        logger.info("\n take decision \n");
+
         return decision.toString();
     }
 
@@ -67,6 +74,8 @@ public class Explorer implements IExplorerRaid {
         logger.info("The status of the drone is {}", status);
         JSONObject extraInfo = response.getJSONObject("extras");
         logger.info("Additional information received: {}", extraInfo);
+        logger.info("\n acknowledge results \n");
+        droneController.setResult(response);
     }
 
     @Override
