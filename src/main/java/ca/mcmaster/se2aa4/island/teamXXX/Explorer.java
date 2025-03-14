@@ -15,6 +15,7 @@ public class Explorer implements IExplorerRaid {
     private final Logger logger = LogManager.getLogger();
     private DroneController droneController;
     int i = 0;
+    int j = 0;
 
     @Override
     public void initialize(String s) {
@@ -36,30 +37,33 @@ public class Explorer implements IExplorerRaid {
 
     @Override
     public String takeDecision() {
-        JSONObject decision = droneController.makeDecision();
-        //JSONObject decision = new JSONObject();
-        //decision.put("action", "stop"); // we stop the exploration immediately
-        // if (i % 2 == 0) {
-        //     decision.put("action", "fly");
-        // }
-        // else {
-        //     JSONObject parameter = new JSONObject();
-        //     decision.put("action", "scan");
-        //     parameter.put("direction", Directions.N);
-        //     decision.put("parameters", parameter);
-        // }
-        // i++;
-        // JSONObject parameter = new JSONObject();
-        // JSONObject parameter = new JSONObject();
+        JSONObject decision = new JSONObject(); // ✅ Ensure it's initialized
+        //int j = 0;
 
-        // decision.put("action", "scan");
+        if (i < 50) {
+            if (j == 0) {
+                droneController.scan();
+                j++;
+            } else if (j == 1) {
+                droneController.goRight();
+                logger.info("\n going left \n");
+                j++;
+            } else if (j == 2) {
+                droneController.goLeft();
+                logger.info("\n going right \n");
+                j = 0;
+            }
+            decision = droneController.getDecision();
+        } else {
+            decision.put("action", "stop"); // ✅ Correctly modifies the existing variable
+        }
 
-        // parameter.put("direction", Directions.N);
-        // decision.put("parameters", parameter);
-        
+        i++;
+        //decision = droneController.getDecision();
+
         logger.info("** Decision: {}",decision.toString());
 
-        logger.info("\n take decision \n");
+        //logger.info("\n take decision \n");
 
         return decision.toString();
     }
@@ -74,7 +78,7 @@ public class Explorer implements IExplorerRaid {
         logger.info("The status of the drone is {}", status);
         JSONObject extraInfo = response.getJSONObject("extras");
         logger.info("Additional information received: {}", extraInfo);
-        logger.info("\n acknowledge results \n");
+        //logger.info("\n acknowledge results \n");
         droneController.setResult(response);
     }
 

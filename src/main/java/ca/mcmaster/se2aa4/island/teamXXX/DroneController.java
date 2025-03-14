@@ -44,4 +44,22 @@ public class DroneController {
     public void setResult(JSONObject result) {
         this.latestResult = result;
     }
+
+    //test
+    public void goLeft() {
+        drone.turnLeft();
+    }
+
+    public void goRight() {
+        drone.turnRight();
+    }
+
+    public void scan() {
+        radar.scan();
+    }
+
+    public JSONObject getDecision() {
+        return commandTracker.getLatestCommand();
+    }
+
 }
