@@ -11,7 +11,7 @@ import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 
 public class Searcher extends State {
 
-    // boooleans indicating whether to fly or scan on this iteration
+    // boooleans indicating whether to fly or scan on this iteration 
     private boolean scan;
     private boolean fly;
     
