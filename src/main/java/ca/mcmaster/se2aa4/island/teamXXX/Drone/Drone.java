@@ -91,6 +91,11 @@ public class Drone extends ExplorerSubject implements Movable {
     }
 
     @Override
+    public void useBattery(int amount) {
+        battery.useBattery(amount);
+    }
+
+    @Override
     public int getX() {
         return this.x;
     }

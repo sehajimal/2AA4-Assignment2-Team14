@@ -36,12 +36,20 @@ public class DroneController {
         this.commandTracker = new CommandTracker(subjects);
     }
 
-    public JSONObject makeDecision(){
+    public JSONObject makeDecision() {
+        // updating battery
+        updatebattery(latestResult.getInt("cost"));
+        //! check limitations first
+        //! must check if state is changed, if so a decision hasnt been made yet (do while loop)
         this.currentState.getNextState(this.latestResult);
         return commandTracker.getLatestCommand();
     }
 
     public void setResult(JSONObject result) {
         this.latestResult = result;
+    }
+
+    private void updatebattery(int amount) {
+        this.drone.useBattery(amount);
     }
 }

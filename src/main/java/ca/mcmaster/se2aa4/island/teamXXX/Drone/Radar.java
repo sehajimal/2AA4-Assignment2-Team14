@@ -12,6 +12,10 @@ public class Radar extends ExplorerSubject {
     public Radar(Directions heading) {
         this.heading = heading;
     }
+
+    public void scan() {
+        update(action.scan());
+    }
     
     public void echoForward() {
         update(action.echo(this.heading));
