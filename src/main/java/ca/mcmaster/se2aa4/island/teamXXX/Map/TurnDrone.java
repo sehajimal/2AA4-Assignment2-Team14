@@ -4,14 +4,16 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
+import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 
 public class TurnDrone extends State {
 
     boolean rightTurn;
     boolean leftTurn;
 
-    public TurnDrone(Drone drone) {
-        super(drone);
+    public TurnDrone(Movable drone, Radar radar, Report report) {
+        super(drone, radar, report);
 
         rightTurn = false;
         leftTurn = false;
@@ -21,10 +23,10 @@ public class TurnDrone extends State {
     public State getNextState(JSONObject response) {
         if (rightTurn) {
             drone.turnRight();
-            return new Searcher(this.drone);
+            return new Searcher(this.drone, this.radar, this.report);
         } else if (leftTurn) {
             drone.turnLeft();
-            return new Searcher(this.drone);
+            return new Searcher(this.drone, this.radar, this.report);
         } else if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) {
             rightTurn = true;
             drone.turnRight();

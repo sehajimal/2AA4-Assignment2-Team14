@@ -14,6 +14,8 @@ public interface Movable {
     
     public int getBatteryLevel();
 
+    public void useBattery(int amount);
+
     public int getX();
 
     public int getY();

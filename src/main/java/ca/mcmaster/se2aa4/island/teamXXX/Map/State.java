@@ -1,14 +1,21 @@
 package ca.mcmaster.se2aa4.island.teamXXX.Map;
 
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
+import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 import org.json.JSONObject;
 
 public abstract class State {
 
-    protected Drone drone;
+    protected Movable drone;
+    protected Radar radar;
+    protected Report report;
 
-    public State(Drone drone) {
+    //! tight coupling with Radar, can be improved (use interface)
+    public State(Movable drone, Radar radar, Report report) {
         this.drone = drone;
+        this.radar = radar;
+        this.report = report;
     }
 
     public abstract State getNextState(JSONObject response);
