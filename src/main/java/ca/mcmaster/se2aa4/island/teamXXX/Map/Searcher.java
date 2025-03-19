@@ -87,7 +87,7 @@ public class Searcher extends State {
         JSONObject extras = response.getJSONObject("extras");
         if (!extras.has("sites")) return false;
 
-        JSONArray sites = extras.getJSONArray("creeks");
+        JSONArray sites = extras.getJSONArray("sites");
         if (sites.length() > 0) {
             return true;
         }
