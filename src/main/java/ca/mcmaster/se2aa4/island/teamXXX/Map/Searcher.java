@@ -46,7 +46,36 @@ public class Searcher extends State {
             fly = false;
             scan = true;
         } else if (scan) {
-            radar.scan();
+            // Echo in all directions and decide where to go
+            JSONObject forwardResponse = radar.echoForward();
+            if (isGround(forwardResponse)) {
+                drone.moveForward();
+                fly = true;
+                scan = false;
+                return this;
+            }
+
+            JSONObject leftResponse = radar.echoLeft();
+            if (isGround(leftResponse)) {
+                drone.turnLeft();
+                drone.moveForward();
+                fly = true;
+                scan = false;
+                return this;
+            }
+
+            JSONObject rightResponse = radar.echoRight();
+            if (isGround(rightResponse)) {
+                drone.turnRight();
+                drone.moveForward();
+                fly = true;
+                scan = false;
+                return this;
+            }
+
+            // If no ground is found, perform a U-turn
+            drone.turnLeft();
+            drone.turnLeft();
             fly = true;
             scan = false;
         }
