@@ -11,7 +11,7 @@ import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 
 public class Searcher extends State {
 
-    // boooleans indicating whether to fly or scan on this iteration 
+    // boooleans indicating whether to fly or scan on this iteration
     private boolean scan;
     private boolean fly;
     
@@ -29,11 +29,9 @@ public class Searcher extends State {
 
             //! add logic to add to report if creek or site is found
             if (foundCreek(response)) {
-                report.addCreek(response.getJSONObject("extras").getJSONArray("creeks").getString(0));
                 //return new State(this.drone, this.radar, this.report);
             }
             if (foundSite(response)) {
-                report.addSite(response.getJSONObject("extras").getJSONArray("sites").getString(0));
                 //return new State(this.drone, this.radar, this.report);
             }
 
@@ -46,36 +44,7 @@ public class Searcher extends State {
             fly = false;
             scan = true;
         } else if (scan) {
-            // Echo in all directions and decide where to go
-            JSONObject forwardResponse = radar.echoForward();
-            if (isGround(forwardResponse)) {
-                drone.moveForward();
-                fly = true;
-                scan = false;
-                return this;
-            }
-
-            JSONObject leftResponse = radar.echoLeft();
-            if (isGround(leftResponse)) {
-                drone.turnLeft();
-                drone.moveForward();
-                fly = true;
-                scan = false;
-                return this;
-            }
-
-            JSONObject rightResponse = radar.echoRight();
-            if (isGround(rightResponse)) {
-                drone.turnRight();
-                drone.moveForward();
-                fly = true;
-                scan = false;
-                return this;
-            }
-
-            // If no ground is found, perform a U-turn
-            drone.turnLeft();
-            drone.turnLeft();
+            radar.scan();
             fly = true;
             scan = false;
         }
@@ -118,7 +87,7 @@ public class Searcher extends State {
         JSONObject extras = response.getJSONObject("extras");
         if (!extras.has("sites")) return false;
 
-        JSONArray sites = extras.getJSONArray("sites");
+        JSONArray sites = extras.getJSONArray("creeks");
         if (sites.length() > 0) {
             return true;
         }

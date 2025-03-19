@@ -12,33 +12,51 @@ import org.apache.logging.log4j.Logger;
 
 public class findIsland extends State {
     private static final Logger logger = LogManager.getLogger(findIsland.class);
-    private Drone drone;
-    private boolean turnRightNext = true; 
+    private boolean turnRightNext;
+    private boolean turnLeftNext; 
+    private boolean moveForward;
 
     public findIsland(Drone drone, Radar radar, Report report) {
         super(drone, radar, report); // Pass the required arguments to the State constructor
         this.drone = drone;
+        this.turnRightNext = true;
+        this.moveForward = false;
+        this.turnLeftNext = false;
     }
 
     @Override
     public State getNextState(JSONObject response) {
+        if (foundGround(response)) {
+            // move to go to island state
+            return null;
+        }
+        if (moveForward) {
+            drone.moveForward();
+            moveForward = false;
+        } else if (turnRightNext) {
+            drone.turnRight();
+            turnRightNext = false;
+            turnLeftNext = true;
+            moveForward = true;
+        } else if (turnLeftNext) {
+            drone.turnLeft();
+            turnLeftNext = false;
+            turnRightNext = true;
+            moveForward = true;
+        }    
+        return this;
+    }
+
+    private boolean foundGround(JSONObject response) {
         if (response.has("extras")) {
             JSONObject extras = response.getJSONObject("extras");
-            if (extras.has("found") && extras.getBoolean("found")) {
-                logger.info("Land found! Stopping search.");
-                return this; 
+            if (extras.has("found")) {
+                String found = extras.getString("found");
+                if ("GROUND".equals(found)) {
+                    return true;
+                }
             }
         }
-        
-        if (turnRightNext) {
-            drone.turnRight();
-        } else {
-            drone.turnLeft();
-        }
-        
-        turnRightNext = !turnRightNext; 
-        drone.moveForward(); 
-        
-        return this;
+        return false;
     }
 }
