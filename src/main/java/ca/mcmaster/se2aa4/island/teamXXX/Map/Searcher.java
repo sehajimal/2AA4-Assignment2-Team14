@@ -29,9 +29,11 @@ public class Searcher extends State {
 
             //! add logic to add to report if creek or site is found
             if (foundCreek(response)) {
+                report.addCreek(response.getJSONObject("extras").getJSONArray("creeks").getString(0));
                 //return new State(this.drone, this.radar, this.report);
             }
             if (foundSite(response)) {
+                report.addSite(response.getJSONObject("extras").getJSONArray("sites").getString(0));
                 //return new State(this.drone, this.radar, this.report);
             }
 
