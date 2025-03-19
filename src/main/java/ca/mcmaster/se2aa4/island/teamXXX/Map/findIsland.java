@@ -6,8 +6,12 @@ import ca.mcmaster.se2aa4.island.teamXXX.Map.Report;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class findIsland extends State {
+    private static final Logger logger = LogManager.getLogger(findIsland.class);
     private Drone drone;
     private boolean turnRightNext = true; 
 
@@ -21,7 +25,7 @@ public class findIsland extends State {
         if (response.has("extras")) {
             JSONObject extras = response.getJSONObject("extras");
             if (extras.has("found") && extras.getBoolean("found")) {
-                System.out.println("Land found! Stopping search.");
+                logger.info("Land found! Stopping search.");
                 return this; 
             }
         }
