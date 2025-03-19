@@ -4,23 +4,23 @@ import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Map.Report;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 
-public class findIsland extends State {
-    private static final Logger logger = LogManager.getLogger(findIsland.class);
+public class FindIsland extends State {
+    private static final Logger logger = LogManager.getLogger(FindIsland.class);
     private boolean turnRightNext;
     private boolean turnLeftNext; 
     private boolean moveForward;
 
-    public findIsland(Drone drone, Radar radar, Report report) {
+    public FindIsland(Movable drone, Radar radar, Report report) {
         super(drone, radar, report); // Pass the required arguments to the State constructor
-        this.drone = drone;
         this.turnRightNext = true;
-        this.moveForward = false;
         this.turnLeftNext = false;
     }
 
@@ -28,22 +28,17 @@ public class findIsland extends State {
     public State getNextState(JSONObject response) {
         if (foundGround(response)) {
             // move to go to island state
-            return null;
+            return new GoToIsland(this.drone, this.radar, this.report, getDistance(response));
         }
-        if (moveForward) {
-            drone.moveForward();
-            moveForward = false;
-        } else if (turnRightNext) {
+        if (turnRightNext) {
             drone.turnRight();
             turnRightNext = false;
             turnLeftNext = true;
-            moveForward = true;
         } else if (turnLeftNext) {
             drone.turnLeft();
             turnLeftNext = false;
             turnRightNext = true;
-            moveForward = true;
-        }    
+        }
         return this;
     }
 
@@ -58,5 +53,16 @@ public class findIsland extends State {
             }
         }
         return false;
+    }
+
+    private int getDistance(JSONObject response) {
+        int range = 0;
+        if (response.has("extras")) {
+            JSONObject extras = response.getJSONObject("extras");
+            if (extras.has("range")) {
+                range = extras.getInt("range");
+            }
+        }
+        return range;
     }
 }

@@ -11,6 +11,8 @@ import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.DroneLimits;
 import ca.mcmaster.se2aa4.island.teamXXX.Map.State;
+import ca.mcmaster.se2aa4.island.teamXXX.Map.FindIsland;
+import ca.mcmaster.se2aa4.island.teamXXX.Map.Report;
 import org.json.JSONObject;
 
 
@@ -20,6 +22,7 @@ public class DroneController {
     //private Movable drone;
     private Drone drone;
     private Radar radar;
+    private Report report;
     //! can refactor to not hold the drone
     private DroneLimits limitations;
     private State currentState;
@@ -31,6 +34,9 @@ public class DroneController {
         this.drone = new Drone(batteryLevel, heading);
         this.radar = new Radar(this.drone.getHeading());
         this.limitations = new DroneLimits(drone);
+        this.report = Report.getInstance();
+        //start state
+        this.currentState = new FindIsland(this.drone, this.radar, this.report);
 
         List<ExplorerSubject> subjects = Arrays.asList(drone, radar);
         this.commandTracker = new CommandTracker(subjects);
@@ -40,8 +46,13 @@ public class DroneController {
         // updating battery
         updatebattery(latestResult.getInt("cost"));
         //! check limitations first
-        //! must check if state is changed, if so a decision hasnt been made yet (do while loop)
-        this.currentState.getNextState(this.latestResult);
+            State newState;
+            // since actions are not performed upon changing states, if states change loop
+            do {
+                newState = this.currentState.getNextState(this.latestResult);
+                this.currentState = newState;
+            } while (newState != this.currentState); 
+
         return commandTracker.getLatestCommand();
     }
 
