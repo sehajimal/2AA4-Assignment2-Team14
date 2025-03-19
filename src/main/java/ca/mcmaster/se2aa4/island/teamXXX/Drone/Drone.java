@@ -17,6 +17,8 @@ public class Drone extends ExplorerSubject implements Movable {
     public Drone(Integer amount, String starting) {
         this.battery = new Battery(amount);
         this.costPerMove = costPerMove;
+        x = 0;
+        y = 0;
         try {
             this.heading = Directions.valueOf(starting);
         } catch (Exception e) {
