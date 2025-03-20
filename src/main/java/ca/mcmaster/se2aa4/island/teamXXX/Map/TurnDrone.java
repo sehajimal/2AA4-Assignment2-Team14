@@ -41,7 +41,7 @@ public class TurnDrone extends State {
                 return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
             // otherwise search for ground again
             } else {
-                return new FindIsland(this.drone, this.radar, this.report);
+                return new ReturnToIsland(this.drone, this.radar, this.report);
             }
         } else if (turnComplete) {
             // once turn is complete check if ground is in direction
