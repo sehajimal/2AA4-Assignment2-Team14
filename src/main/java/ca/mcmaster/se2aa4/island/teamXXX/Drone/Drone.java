@@ -13,6 +13,7 @@ public class Drone extends ExplorerSubject implements Movable {
     private static final Logger logger = LogManager.getLogger(Drone.class);
 
     private Navigator navigator = new Navigator();
+    private Radar radar;
     private Directions heading;
     private Battery battery;
     private int x;
@@ -20,16 +21,14 @@ public class Drone extends ExplorerSubject implements Movable {
     private int costPerMove;
     private Actions actions = new Actions();
 
-    public Drone(Integer amount, String starting) {
+    //? remove tight coupling with Drone class later
+    public Drone(Integer amount, Directions starting, Radar radar) {
+        this.radar = radar;
         this.battery = new Battery(amount);
         this.costPerMove = costPerMove;
         x = 0;
         y = 0;
-        try {
-            this.heading = Directions.valueOf(starting);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.heading = starting;
     }
 
     private void updateCoordinates() {
@@ -59,7 +58,11 @@ public class Drone extends ExplorerSubject implements Movable {
     @Override
     public void turnRight() {
         updateCoordinates();
+        //logger.info("\n drone check 1 \n");
         this.heading = navigator.getRight(this.heading);
+        //logger.info("\n drone check 2 \n");
+        this.radar.setHeading(this.heading);
+        //logger.info("\n drone check 3 \n");
         updateCoordinates();
 
         update(actions.heading(this.heading));
@@ -70,8 +73,10 @@ public class Drone extends ExplorerSubject implements Movable {
         updateCoordinates();
         logger.info(getHeading());
         this.heading = navigator.getLeft(this.heading);
+        this.radar.setHeading(this.heading);
         updateCoordinates();
         logger.info(getHeading());
+        logger.info(getBatteryLevel());
 
         update(actions.heading(this.heading));
     }

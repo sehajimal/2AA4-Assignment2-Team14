@@ -39,7 +39,7 @@ public class Explorer implements IExplorerRaid {
 
         i++;
 
-        if (i > 150) {
+        if (i > 200) {
             JSONObject decision = droneController.stopExploration();
             return decision.toString();
         }

@@ -13,10 +13,12 @@ import org.apache.logging.log4j.Logger;
 public class TurnDrone extends State {
 
     private static final Logger logger = LogManager.getLogger(FindIsland.class);
+    private final Detector detector = new Detector();
 
     boolean rightTurn;
     boolean leftTurn;
     boolean turnComplete;
+    boolean checkGround;
 
     public TurnDrone(Movable drone, Radar radar, Report report) {
         super(drone, radar, report);
@@ -24,6 +26,7 @@ public class TurnDrone extends State {
         rightTurn = false;
         leftTurn = false;
         turnComplete = false;
+        checkGround = false;
 
         logger.info("\n TURN DRONE \n");
     }
@@ -31,8 +34,21 @@ public class TurnDrone extends State {
     @Override
     public State getNextState(JSONObject response) {
         logger.info(drone.getHeading());
-        if (turnComplete) {
-            return new Searcher(this.drone, this.radar, this.report);
+        //
+        if (checkGround) {
+            // if ground is there go toir
+            if (detector.foundGround(response)) {
+                return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
+            // otherwise search for ground again
+            } else {
+                return new FindIsland(this.drone, this.radar, this.report);
+            }
+        } else if (turnComplete) {
+            // once turn is complete check if ground is in direction
+            checkGround = true;
+            radar.echoForward();
+            return this;
+            //return new Searcher(this.drone, this.radar, this.report);
         } else if (rightTurn) {
             drone.turnRight();
             logger.info("\n SECOND RIGHT \n");

@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 public class FindIsland extends State {
     private static final Logger logger = LogManager.getLogger(FindIsland.class);
+    private final Detector detector = new Detector();
     private boolean turnRightNext;
     private boolean turnLeftNext; 
     private boolean moveForward;
@@ -29,15 +30,17 @@ public class FindIsland extends State {
     @Override
     public State getNextState(JSONObject response) {
         //logger.info("\n IN STATE \n");
-        if (foundGround(response)) {
+        if (detector.foundGround(response)) {
             // move to go to island state
-            return new GoToIsland(this.drone, this.radar, this.report, getDistance(response));
+            return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
         }
         if (echo) {
             radar.echoForward();
             echo = false;
         } else if (turnRightNext) {
+            //logger.info("\n Taking Right \n");
             drone.turnRight();
+            //logger.info("\n check 1 \n");
             turnRightNext = false;
             turnLeftNext = true;
             echo = true;
@@ -52,30 +55,30 @@ public class FindIsland extends State {
         return this;
     }
 
-    private boolean foundGround(JSONObject response) {
-        if (response == null) {
-            return false;
-        }
-        if (response.has("extras")) {
-            JSONObject extras = response.getJSONObject("extras");
-            if (extras.has("found")) {
-                String found = extras.getString("found");
-                if ("GROUND".equals(found)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    // private boolean foundGround(JSONObject response) {
+    //     if (response == null) {
+    //         return false;
+    //     }
+    //     if (response.has("extras")) {
+    //         JSONObject extras = response.getJSONObject("extras");
+    //         if (extras.has("found")) {
+    //             String found = extras.getString("found");
+    //             if ("GROUND".equals(found)) {
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
 
-    private int getDistance(JSONObject response) {
-        int range = 0;
-        if (response.has("extras")) {
-            JSONObject extras = response.getJSONObject("extras");
-            if (extras.has("range")) {
-                range = extras.getInt("range");
-            }
-        }
-        return range;
-    }
+    // private int getDistance(JSONObject response) {
+    //     int range = 0;
+    //     if (response.has("extras")) {
+    //         JSONObject extras = response.getJSONObject("extras");
+    //         if (extras.has("range")) {
+    //             range = extras.getInt("range");
+    //         }
+    //     }
+    //     return range;
+    // }
 }

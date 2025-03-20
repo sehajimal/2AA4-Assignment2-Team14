@@ -35,9 +35,16 @@ public class DroneController {
 
     //! update constructor to initialize state to be findIsland
     public DroneController(String heading, int batteryLevel) {
+        Directions eHeading = Directions.E;
+        try {
+            eHeading = Directions.valueOf(heading);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        this.drone = new Drone(batteryLevel, heading);
-        this.radar = new Radar(this.drone.getHeading());
+        //this.drone = new Drone(batteryLevel, heading);
+        this.radar = new Radar(eHeading);
+        this.drone = new Drone(batteryLevel, eHeading, this.radar);
         this.limitations = new DroneLimits(drone);
         this.report = Report.getInstance();
         //start state
@@ -68,7 +75,9 @@ public class DroneController {
             //logger.info("\n IN DO WHILE LOOP: prevState={}, newState={} \n", prevState, newState);
             
             currState = this.currentState; // Store previous state
+            //logger.info("\n TEST1 \n");
             nextState = this.currentState.getNextState(this.latestResult);
+            //logger.info("\n TEST2 \n");
         
             //logger.info("\n GOT NEXT STATE: prevState={}, newState={} \n", currState, nextState);
         
@@ -78,8 +87,7 @@ public class DroneController {
         
         } while (!(currState == nextState));
         
-        //logger.info("\n TEST2 \n");
-        System.out.println("\n BATTERY LEVEL " + this.drone.getBatteryLevel());
+        //logger.info("\n TEST \n");
         return commandTracker.getLatestCommand();
     }
 
