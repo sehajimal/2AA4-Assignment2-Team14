@@ -7,8 +7,8 @@ import org.json.JSONObject;
 
 public abstract class State {
 
-    protected Movable drone;
-    protected Radar radar;
+    protected final Movable drone;
+    protected final Radar radar;
     protected Report report;
 
     //! tight coupling with Radar, can be improved (use interface)

@@ -16,7 +16,7 @@ import eu.ace_design.island.game.actions.Actions;
  */
 public class DroneLimits {
     
-    private Drone drone;
+    private final Drone drone;
     private int maxX;
     private int maxY;
     private int minX;
@@ -52,11 +52,13 @@ public class DroneLimits {
     }
 
     // indicates if we must return to base now
-    public boolean sufficientBattery(int x, int y, int batteryLevel, int cost) {
-
-        if ((x + y) * cost + cost < batteryLevel) {
+    public boolean insufficientBattery() {
+        //logger.info("IN BATTERY CHECK");
+        if (this.drone.getBatteryLevel() < ((double) this.drone.getInitialBatteryLevel() * 0.007)) {
+            //logger.info("BATTERY CHECK: INSUFFICIENT");
             return true;
         }
+        //logger.info("BATTERY CHECK: SUFFICIENT");
         return false;
     }
 

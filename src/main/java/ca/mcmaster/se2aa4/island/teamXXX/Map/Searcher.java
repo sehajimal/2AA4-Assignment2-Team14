@@ -36,9 +36,17 @@ public class Searcher extends State {
 
             //! add logic to add to report if creek or site is found
             if (foundCreek(response)) {
+                String[] creeks = getCreeks(response);
+                for (String creek : creeks) {
+                    addCreekToReport(creek);
+                }
                 //return new State(this.drone, this.radar, this.report);
             }
             if (foundSite(response)) {
+                String[] sites = getSites(response);
+                for (String site : sites) {
+                    addCreekToReport(site);
+                }
                 //return new State(this.drone, this.radar, this.report);
             }
 
@@ -111,11 +119,51 @@ public class Searcher extends State {
         JSONObject extras = response.getJSONObject("extras");
         if (!extras.has("sites")) return false;
 
-        JSONArray sites = extras.getJSONArray("creeks");
+        JSONArray sites = extras.getJSONArray("sites");
         if (sites.length() > 0) {
             return true;
         }
         return false;
     }
+
+    private String[] getCreeks(JSONObject response) {
+        JSONObject extras = response.optJSONObject("extras");
+        if (extras != null && extras.has("creeks")) {
+            JSONArray creeksArray = extras.optJSONArray("creeks");
+            String[] creeks = new String[creeksArray.length()];
+            for (int i = 0; i < creeksArray.length(); i++) {
+                creeks[i] = creeksArray.optString(i);
+            }
+            return creeks;
+        }
+        return new String[0]; // Return an empty array if no creeks are found
+    }
+    
+    private String[] getSites(JSONObject response) {
+        JSONObject extras = response.optJSONObject("extras");
+        if (extras != null && extras.has("sites")) {
+            JSONArray sitesArray = extras.optJSONArray("sites");
+            String[] sites = new String[sitesArray.length()];
+            for (int i = 0; i < sitesArray.length(); i++) {
+                sites[i] = sitesArray.optString(i);
+            }
+            return sites;
+        }
+        return new String[0]; // Return an empty array if no sites are found
+    }
+    
+
+    public void addCreekToReport(String creekId) {
+        double x = this.drone.getX();
+        double y = this.drone.getY();
+        report.addCreek(creekId, x, y);
+    }
+
+    // Add a site to the report from the drone's coordinates
+    public void addSiteToReport(String siteId) {
+        double x = this.drone.getX();
+        double y = this.drone.getY();
+        report.addSite(siteId, x, y);
+    }  
 
 }

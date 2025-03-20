@@ -45,7 +45,7 @@ public class DroneController {
         //this.drone = new Drone(batteryLevel, heading);
         this.radar = new Radar(eHeading);
         this.drone = new Drone(batteryLevel, eHeading, this.radar);
-        this.limitations = new DroneLimits(drone);
+        this.limitations = new DroneLimits(this.drone);
         this.report = Report.getInstance();
         //start state
         this.currentState = new FindIsland(this.drone, this.radar, this.report);
@@ -60,14 +60,16 @@ public class DroneController {
 
         // updating battery
         updatebattery();
-        //! check limitations first
-        if (this.drone.shouldGoHome()) {
-            //? print battery level?
-            JSONObject decision = new JSONObject();
-            decision.put("action", "stop");  
-            return decision;  
+        logger.info("Battery Level: ", this.drone.getBatteryLevel());
+        
+        // checking if exploration should stop
+        //logger.info("START BATTERY CHECK");
+        if (limitations.insufficientBattery()) {
+            //logger.info("FAILED BATTERY CHECK");
+            return stopExploration();
         }
 
+        //logger.info("PASSED BATTERY CHECK");
         State nextState;
         State currState;
 
@@ -97,10 +99,8 @@ public class DroneController {
 
     //! make private
     public JSONObject stopExploration() {
-        //this.drone.stop();
-        JSONObject decision = new JSONObject();
-        decision.put("action", "stop");  
-        return decision; 
+        this.drone.stop();
+        return commandTracker.getLatestCommand(); 
     }
 
     private void updatebattery() {

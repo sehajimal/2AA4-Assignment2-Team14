@@ -21,5 +21,7 @@ public interface Movable {
     public int getY();
 
     public Directions getHeading();
+
+    public int getInitialBatteryLevel();
     
 }

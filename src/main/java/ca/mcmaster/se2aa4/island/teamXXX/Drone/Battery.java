@@ -25,4 +25,8 @@ public class Battery {
         int estimatedReturnCost = (x + y) * costPerMove;
         return batteryLevel <= estimatedReturnCost;
     }
+
+    public int getInitialLevel() {
+        return this.initialBattery;
+    }
 }

@@ -86,18 +86,18 @@ public class Drone extends ExplorerSubject implements Movable {
         update(actions.stop());
     }
 
-    public void returnHome() {
-        System.out.println("Return home in progress... Battery levels low!");
-        while (x > 0) {
-            x--;
-            battery.useBattery(costPerMove);
-        }
-        while (y > 0) {
-            y--;
-            battery.useBattery(costPerMove);
-        }
-        stop();
-    }
+    // public void returnHome() {
+    //     System.out.println("Return home in progress... Battery levels low!");
+    //     while (x > 0) {
+    //         x--;
+    //         battery.useBattery(costPerMove);
+    //     }
+    //     while (y > 0) {
+    //         y--;
+    //         battery.useBattery(costPerMove);
+    //     }
+    //     stop();
+    // }
 
     public boolean shouldGoHome() {
         if (this.battery.getBatteryLevel() < 50) {
@@ -130,5 +130,10 @@ public class Drone extends ExplorerSubject implements Movable {
     @Override
     public Directions getHeading() {
         return this.heading;
+    }
+
+    @Override
+    public int getInitialBatteryLevel() {
+        return this.battery.getInitialLevel();
     }
 }
