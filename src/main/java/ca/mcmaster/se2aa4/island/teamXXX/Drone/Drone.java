@@ -3,8 +3,14 @@ package ca.mcmaster.se2aa4.island.teamXXX.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ExplorerSubject;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Map.FindIsland;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Drone extends ExplorerSubject implements Movable {
+
+    private static final Logger logger = LogManager.getLogger(Drone.class);
 
     private Navigator navigator = new Navigator();
     private Directions heading;
@@ -62,8 +68,10 @@ public class Drone extends ExplorerSubject implements Movable {
     @Override
     public void turnLeft() {
         updateCoordinates();
+        logger.info(getHeading());
         this.heading = navigator.getLeft(this.heading);
         updateCoordinates();
+        logger.info(getHeading());
 
         update(actions.heading(this.heading));
     }
@@ -84,6 +92,13 @@ public class Drone extends ExplorerSubject implements Movable {
             battery.useBattery(costPerMove);
         }
         stop();
+    }
+
+    public boolean shouldGoHome() {
+        if (this.battery.getBatteryLevel() < 50) {
+            return true;
+        }
+        return false;
     }
 
     

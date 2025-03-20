@@ -4,6 +4,9 @@ import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ExplorerSubject;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +20,8 @@ import org.json.JSONObject;
 
 
 public class DroneController {
+
+    private final Logger logger = LogManager.getLogger();
 
     private CommandTracker commandTracker;
     //private Movable drone;
@@ -38,21 +43,43 @@ public class DroneController {
         //start state
         this.currentState = new FindIsland(this.drone, this.radar, this.report);
 
-        List<ExplorerSubject> subjects = Arrays.asList(drone, radar);
+        List<ExplorerSubject> subjects = Arrays.asList(this.drone, this.radar);
         this.commandTracker = new CommandTracker(subjects);
+        //logger.info("\n COMPLETED INITIALIZATION OF CONTROLLED \n");
     }
 
     public JSONObject makeDecision() {
-        // updating battery
-        updatebattery(latestResult.getInt("cost"));
-        //! check limitations first
-            State newState;
-            // since actions are not performed upon changing states, if states change loop
-            do {
-                newState = this.currentState.getNextState(this.latestResult);
-                this.currentState = newState;
-            } while (newState != this.currentState); 
+        //logger.info("\n ENTERING makeDecision() \n");
 
+        // updating battery
+        updatebattery();
+        //! check limitations first
+        if (this.drone.shouldGoHome()) {
+            //? print battery level?
+            JSONObject decision = new JSONObject();
+            decision.put("action", "stop");  
+            return decision;  
+        }
+
+        State nextState;
+        State currState;
+
+        do {
+            //logger.info("\n IN DO WHILE LOOP: prevState={}, newState={} \n", prevState, newState);
+            
+            currState = this.currentState; // Store previous state
+            nextState = this.currentState.getNextState(this.latestResult);
+        
+            //logger.info("\n GOT NEXT STATE: prevState={}, newState={} \n", currState, nextState);
+        
+            this.currentState = nextState; // Update state
+        
+            //logger.info("\n UPDATED STATE: prevState={}, newState={} \n", currState, nextState);
+        
+        } while (!(currState == nextState));
+        
+        //logger.info("\n TEST2 \n");
+        System.out.println("\n BATTERY LEVEL " + this.drone.getBatteryLevel());
         return commandTracker.getLatestCommand();
     }
 
@@ -60,7 +87,18 @@ public class DroneController {
         this.latestResult = result;
     }
 
-    private void updatebattery(int amount) {
-        this.drone.useBattery(amount);
+    //! make private
+    public JSONObject stopExploration() {
+        //this.drone.stop();
+        JSONObject decision = new JSONObject();
+        decision.put("action", "stop");  
+        return decision; 
+    }
+
+    private void updatebattery() {
+        if (latestResult != null) {
+            int amount = latestResult.getInt("cost");
+            this.drone.useBattery(amount);
+        }
     }
 }

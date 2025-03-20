@@ -18,6 +18,7 @@ public class GoToIsland extends State {
     @Override
     public State getNextState(JSONObject response) {
         if (this.distance > 0) {
+            distance--;
             drone.moveForward();
             return this;
         }

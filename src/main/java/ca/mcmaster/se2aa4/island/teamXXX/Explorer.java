@@ -36,14 +36,21 @@ public class Explorer implements IExplorerRaid {
 
     @Override
     public String takeDecision() {
-        JSONObject decision = droneController.makeDecision();
-        while (i < 50) {
-            decision = droneController.makeDecision();
+
+        i++;
+
+        if (i > 150) {
+            JSONObject decision = droneController.stopExploration();
+            return decision.toString();
         }
-        
-        logger.info("** Decision: {}",decision.toString());
 
         logger.info("\n take decision \n");
+
+        JSONObject decision = droneController.makeDecision();
+
+        logger.info("** Decision: {}", decision.toString());
+
+        //logger.info("\n take decision \n");
 
         return decision.toString();
     }

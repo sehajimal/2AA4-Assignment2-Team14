@@ -17,32 +17,45 @@ public class FindIsland extends State {
     private boolean turnRightNext;
     private boolean turnLeftNext; 
     private boolean moveForward;
+    private boolean echo;
 
     public FindIsland(Movable drone, Radar radar, Report report) {
         super(drone, radar, report); // Pass the required arguments to the State constructor
         this.turnRightNext = true;
         this.turnLeftNext = false;
+        this.echo = false;
     }
 
     @Override
     public State getNextState(JSONObject response) {
+        //logger.info("\n IN STATE \n");
         if (foundGround(response)) {
             // move to go to island state
             return new GoToIsland(this.drone, this.radar, this.report, getDistance(response));
         }
-        if (turnRightNext) {
+        if (echo) {
+            radar.echoForward();
+            echo = false;
+        } else if (turnRightNext) {
             drone.turnRight();
             turnRightNext = false;
             turnLeftNext = true;
+            echo = true;
+            logger.info(drone.getHeading());
         } else if (turnLeftNext) {
             drone.turnLeft();
             turnLeftNext = false;
             turnRightNext = true;
+            echo = true;
+            logger.info(drone.getHeading());
         }
         return this;
     }
 
     private boolean foundGround(JSONObject response) {
+        if (response == null) {
+            return false;
+        }
         if (response.has("extras")) {
             JSONObject extras = response.getJSONObject("extras");
             if (extras.has("found")) {
