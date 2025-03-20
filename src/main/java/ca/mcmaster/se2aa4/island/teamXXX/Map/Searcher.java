@@ -154,16 +154,16 @@ public class Searcher extends State {
     
 
     public void addCreekToReport(String creekId) {
-        double x = this.drone.getX();
-        double y = this.drone.getY();
-        report.addCreek(creekId, x, y);
+        int x = this.drone.getX();
+        int y = this.drone.getY();
+        this.report.addCreek(creekId, x, y);
     }
 
     // Add a site to the report from the drone's coordinates
     public void addSiteToReport(String siteId) {
-        double x = this.drone.getX();
-        double y = this.drone.getY();
-        report.addSite(siteId, x, y);
+        int x = this.drone.getX();
+        int y = this.drone.getY();
+        this.report.addSite(siteId, x, y);
     }  
 
 }
