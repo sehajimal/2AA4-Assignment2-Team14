@@ -36,6 +36,8 @@ public class ReturnToIsland extends State {
         //turnleft = false;
         turnComplete = false;
         finalCheck  = false;
+
+        logger.info("IN RETURN TO ISLAND");
     }
 
     @Override
@@ -48,7 +50,7 @@ public class ReturnToIsland extends State {
             return new ReturnToIsland(this.drone, this.radar, this.report);
         }
 
-        if (turnComplete = true) {
+        if (turnComplete) {
             radar.echoForward();
             finalCheck = true;
             turnComplete = false;

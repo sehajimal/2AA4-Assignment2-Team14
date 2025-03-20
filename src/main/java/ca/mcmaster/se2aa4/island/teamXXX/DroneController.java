@@ -57,6 +57,12 @@ public class DroneController {
 
     public JSONObject makeDecision() {
         //logger.info("\n ENTERING makeDecision() \n");
+        // logger.info("\n DRONE AND RADAR HEADINGS");
+        // logger.info("\n");
+        // logger.info(drone.getHeading());
+        // logger.info("\n");
+        // logger.info(radar.getHeading());
+        // logger.info("\n");
 
         // updating battery
         updatebattery();

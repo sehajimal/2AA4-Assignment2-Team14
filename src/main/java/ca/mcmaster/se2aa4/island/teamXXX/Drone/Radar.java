@@ -41,4 +41,10 @@ public class Radar extends ExplorerSubject {
         //logger.info("radar check 2");
     }
 
+    public Directions getHeading() {
+        //logger.info("radar check 1");
+        return this.heading;
+        //logger.info("radar check 2");
+    }
+
 }

@@ -33,6 +33,7 @@ public class TurnDrone extends State {
 
     @Override
     public State getNextState(JSONObject response) {
+        logger.info("\n IN TURN DRONE \n");
         logger.info(drone.getHeading());
         //
         if (checkGround) {
