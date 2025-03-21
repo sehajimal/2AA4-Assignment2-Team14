@@ -4,6 +4,8 @@ import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,13 +15,9 @@ public class ReturnToIsland extends State {
     private static final Logger logger = LogManager.getLogger(ReturnToIsland.class);
 
     private Detector detector;
-    private boolean echo;
-    private boolean echoRight;
-    private boolean echoLeft;
-    private boolean checkLeft;
-    private boolean checkRight;
-    private boolean turnRight;
-    private boolean turnleft;
+    private boolean goForward;
+    private boolean goLeft;
+    private boolean goRight;
     private boolean turnComplete;
     private boolean finalCheck;
     
@@ -28,68 +26,61 @@ public class ReturnToIsland extends State {
 
         this.detector = new Detector();
 
-        echo = true;
-        echoRight= true;
-        echoLeft = false;
-        checkRight = false;
-        checkLeft = false;
-        turnRight = false;
-        turnleft = false;
+        goForward = false;
+        goLeft= false;
+        goRight = false;
         turnComplete = false;
-        finalCheck  = false;
+        finalCheck = false;
     }
 
     @Override
     public State getNextState(JSONObject response) {
 
+        logger.info("\n IN RETURN TO ISLAND \n");
+
         if (finalCheck) {
             if (detector.foundGround(response)) {
                 return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
             }
-            return new ReturnToIsland(this.drone, this.radar, this.report);
+            //return new FindIsland(this.drone, this.radar, this.report);
+            drone.stop();
+            return this;
         }
 
         if (turnComplete) {
             radar.echoForward();
-            logger.info("\n ECHO LEFT \n");
             finalCheck = true;
-            turnComplete = false;
             return this;
         }
 
-        if (checkRight) {
-            if (detector.foundGround(response)) {
-                drone.turnRight();
-                turnComplete = true;
-                return this;
-            }
-            checkRight = false;
-        } else if (checkLeft) {
-            if (detector.foundGround(response)) {
-                drone.turnLeft();
-                turnComplete = true;
-                return this;
-            }
-            checkLeft = false;
+        if (goForward) {
+            drone.moveForward();
+            goForward = false;
+            return this;
         }
 
-        if (echo) {
-            if (echoRight) {
-                radar.echoRight();
-                logger.info("\n ECHO RIGHT \n");
-                checkRight = true;
-                echoLeft = true;
-                echoRight = false;
-                return this;
-            } else if (echoLeft) {
-                radar.echoLeft();
-                logger.info("\n ECHO LEFT \n");
-                echo = false;
-                checkLeft = true;
-                echoLeft = false;
-                return this;
-            }
+        if (goRight) {
+            drone.turnRight();
+            turnComplete = true;
+            return this;
+        } else if (goLeft) {
+            drone.turnLeft();
+            turnComplete = true;
+            return this;
         }
-        return new FindIsland(this.drone, this.radar, this.report);
+
+        if (this.drone.getHeading() == Directions.S || this.drone.getHeading() == Directions.W) { //RFL
+            drone.turnRight();
+            goForward = true;
+            goLeft = true;
+            return this;
+        } else if (this.drone.getHeading() == Directions.N || this.drone.getHeading() == Directions.E) { // LFR
+            drone.turnLeft();
+            goForward = true;
+            goRight = true;
+            return this;
+        }
+
+        return null;
     }
 }

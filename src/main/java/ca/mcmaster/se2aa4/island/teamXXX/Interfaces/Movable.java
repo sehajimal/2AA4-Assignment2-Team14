@@ -25,5 +25,7 @@ public interface Movable {
     public int getInitialBatteryLevel();
 
     public boolean hasVisitedLocation();
+
+    public Directions getSearchDirection();
     
 }

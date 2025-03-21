@@ -17,6 +17,7 @@ public class Drone extends ExplorerSubject implements Movable {
     private Navigator navigator = new Navigator();
     private Radar radar;
     private Directions heading;
+    private Directions searchDirection;
     private Battery battery;
     private Set<String> visitedLocations;
     private int x;
@@ -32,6 +33,7 @@ public class Drone extends ExplorerSubject implements Movable {
         x = 0;
         y = 0;
         this.heading = starting;
+        this.searchDirection = navigator.getRight(this.heading);
         this.visitedLocations = new HashSet<>();
     }
 
@@ -63,6 +65,7 @@ public class Drone extends ExplorerSubject implements Movable {
     public void turnRight() {
         updateCoordinates();
         //logger.info("\n drone check 1 \n");
+        this.searchDirection = this.heading;
         this.heading = navigator.getRight(this.heading);
         //logger.info("\n drone check 2 \n");
         this.radar.setHeading(this.heading);
@@ -76,6 +79,8 @@ public class Drone extends ExplorerSubject implements Movable {
     public void turnLeft() {
         updateCoordinates();
         logger.info(getHeading());
+        //updating search direction
+        this.searchDirection = this.heading;
         this.heading = navigator.getLeft(this.heading);
         this.radar.setHeading(this.heading);
         updateCoordinates();
@@ -111,6 +116,11 @@ public class Drone extends ExplorerSubject implements Movable {
         }
         visitedLocations.add(positionKey); //add new location to the set
         return false;
+    }
+
+    @Override
+    public Directions getSearchDirection() {
+        return this.searchDirection;
     }
     
     @Override
