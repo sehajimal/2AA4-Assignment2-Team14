@@ -20,6 +20,7 @@ public class Drone extends ExplorerSubject implements Movable {
     private Directions searchDirection;
     private Battery battery;
     private Set<String> visitedLocations;
+    private Set<String> turnPoints;
     private int x;
     private int y;
     private int costPerMove;
@@ -35,6 +36,7 @@ public class Drone extends ExplorerSubject implements Movable {
         this.heading = starting;
         this.searchDirection = navigator.getRight(this.heading);
         this.visitedLocations = new HashSet<>();
+        this.turnPoints = new HashSet<>();
     }
 
     private void updateCoordinates() {
@@ -108,6 +110,8 @@ public class Drone extends ExplorerSubject implements Movable {
     //     stop();
     // }
 
+    //? code is sort of redundant can be refactored
+
     @Override
     public boolean hasVisitedLocation() {
         String positionKey = x + "," + y; // unique key for (x, y)
@@ -116,6 +120,22 @@ public class Drone extends ExplorerSubject implements Movable {
         }
         visitedLocations.add(positionKey); //add new location to the set
         return false;
+    }
+
+    @Override
+    public boolean isTurnPoint() {
+        String positionKey = x + "," + y;
+        if (turnPoints.contains(positionKey)) {
+            return true; // already visited this location
+        }
+        //turnPoints.add(positionKey);
+        return false;
+    }
+
+    @Override
+    public void addTurnPoint() {
+        String positionKey = x + "," + y;
+        turnPoints.add(positionKey);
     }
 
     @Override

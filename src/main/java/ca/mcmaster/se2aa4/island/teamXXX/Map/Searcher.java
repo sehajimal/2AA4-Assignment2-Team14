@@ -19,6 +19,11 @@ public class Searcher extends State {
     // boooleans indicating whether to fly or scan on this iteration
     private boolean scan;
     private boolean fly;
+
+    //  values used to check if the row or column checked has been visited, avoids looping on same path
+    Integer searchLength;
+    Integer alreadyVisited;
+
     /*
      * bandaid fix for handling case where if at shore, drone gets stuck in turns
      * (switches between TurnDrone and Search), long term an additional state or 
@@ -32,6 +37,9 @@ public class Searcher extends State {
         scan = true;
         fly = false;
         foundLand = false;
+
+        searchLength = 0;
+        alreadyVisited = 0;
     }
 
     @Override
@@ -43,7 +51,6 @@ public class Searcher extends State {
             // ADD LOGIC TO CHECK FOR CREEKS OR SITES
             logger.info("\n IN FLY \n");
 
-            //! add logic to add to report if creek or site is found
             if (foundCreek(response)) {
                 String[] creeks = getCreeks(response);
                 for (String creek : creeks) {
@@ -60,21 +67,38 @@ public class Searcher extends State {
             }
             if (inOcean(response) && foundLand) {
                 logger.info("\n TRANSITION \n");
+                drone.addTurnPoint();
+                logger.info("ALREADY VISITED CHECK");
+                logger.info(alreadyVisited);
+                logger.info(searchLength);
+                if (alreadyVisited > (int) (0.6 * searchLength)) {
+                    logger.info("ALREADY SEARCHED SECTION");
+                    return new ReLocateIsland(this.drone, this.radar, this.report);
+                }
                 return new TurnDrone(this.drone, this.radar, this.report);
             } else if (!inOcean(response) && !foundLand) {
                 logger.info("\n DONT TRANSITION YET \n");
                 foundLand = true;
             }
-
             drone.moveForward();
             fly = false;
             scan = true;
+
         } else if (scan) {
+            searchLength++;
+
+            // check if current location is known to be a turning point
+            if (drone.isTurnPoint()) {
+                //return new TurnDrone(this.drone, this.radar, this.report);
+                return new ReLocateIsland(this.drone, this.radar, this.report);
+            }
             logger.info("\n IN SCAN \n");
             if (drone.hasVisitedLocation()) {
+                alreadyVisited++;
                 drone.moveForward();
                 foundLand = true;
                 logger.info("\n HAS VISITED \n");
+                //alreadyVisited++;
             } else {
                 radar.scan();
                 fly = true;

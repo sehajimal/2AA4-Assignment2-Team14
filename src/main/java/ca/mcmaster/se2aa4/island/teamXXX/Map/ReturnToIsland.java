@@ -43,8 +43,9 @@ public class ReturnToIsland extends State {
                 return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
             }
             //return new FindIsland(this.drone, this.radar, this.report);
-            drone.stop();
-            return this;
+            return new ReLocateIsland(this.drone, this.radar, this.report);
+            //drone.stop();
+            //return this;
         }
 
         if (turnComplete) {
@@ -69,18 +70,46 @@ public class ReturnToIsland extends State {
             return this;
         }
 
-        if (this.drone.getHeading() == Directions.S || this.drone.getHeading() == Directions.W) { //RFL
-            drone.turnRight();
-            goForward = true;
-            goLeft = true;
-            return this;
-        } else if (this.drone.getHeading() == Directions.N || this.drone.getHeading() == Directions.E) { // LFR
-            drone.turnLeft();
-            goForward = true;
-            goRight = true;
-            return this;
-        }
+        // if (this.drone.getHeading() == Directions.S || this.drone.getHeading() == Directions.W) { //RFL
+        //     drone.turnRight();
+        //     goForward = true;
+        //     goLeft = true;
+        //     return this;
+        // } else if (this.drone.getHeading() == Directions.N || this.drone.getHeading() == Directions.E) { // LFR
+        //     drone.turnLeft();
+        //     goForward = true;
+        //     goRight = true;
+        //     return this;
+        // }
 
+        //--------------------------
+
+        if (drone.getSearchDirection() == Directions.S || drone.getSearchDirection() == Directions.E) {
+            logger.info("\n CHECKING DOWN OR RIGHT \n");
+            if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) { //LFR
+                drone.turnLeft();
+                goForward = true;
+                goRight = true;
+                return this;
+            } else if (drone.getHeading() == Directions.S || drone.getHeading() == Directions.W) { //RFL
+                drone.turnRight();
+                goForward = true;
+                goLeft = true;
+                return this;
+            }
+        } else if (drone.getSearchDirection() == Directions.N || drone.getSearchDirection() == Directions.W) {
+            if (drone.getHeading() == Directions.S || drone.getHeading() == Directions.W) { //LFR
+                drone.turnLeft();
+                goForward = true;
+                goRight = true;
+                return this;
+            } else if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) { //RFL
+                drone.turnRight();
+                goForward = true;
+                goLeft = true;
+                return this;
+            }
+        }
         return null;
     }
 }

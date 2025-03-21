@@ -26,6 +26,10 @@ public interface Movable {
 
     public boolean hasVisitedLocation();
 
+    public boolean isTurnPoint();
+
+    public void addTurnPoint();
+
     public Directions getSearchDirection();
     
 }
