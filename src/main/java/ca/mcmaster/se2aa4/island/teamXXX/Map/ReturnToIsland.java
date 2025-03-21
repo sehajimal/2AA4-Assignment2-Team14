@@ -11,14 +11,15 @@ import org.apache.logging.log4j.Logger;
 public class ReturnToIsland extends State {
 
     private static final Logger logger = LogManager.getLogger(ReturnToIsland.class);
+
     private Detector detector;
     private boolean echo;
     private boolean echoRight;
     private boolean echoLeft;
     private boolean checkLeft;
     private boolean checkRight;
-    //private boolean turnRight;
-    //private boolean turnleft;
+    private boolean turnRight;
+    private boolean turnleft;
     private boolean turnComplete;
     private boolean finalCheck;
     
@@ -32,12 +33,10 @@ public class ReturnToIsland extends State {
         echoLeft = false;
         checkRight = false;
         checkLeft = false;
-        //turnRight = false;
-        //turnleft = false;
+        turnRight = false;
+        turnleft = false;
         turnComplete = false;
         finalCheck  = false;
-
-        logger.info("IN RETURN TO ISLAND");
     }
 
     @Override
@@ -52,6 +51,7 @@ public class ReturnToIsland extends State {
 
         if (turnComplete) {
             radar.echoForward();
+            logger.info("\n ECHO LEFT \n");
             finalCheck = true;
             turnComplete = false;
             return this;
@@ -76,12 +76,14 @@ public class ReturnToIsland extends State {
         if (echo) {
             if (echoRight) {
                 radar.echoRight();
+                logger.info("\n ECHO RIGHT \n");
                 checkRight = true;
                 echoLeft = true;
                 echoRight = false;
                 return this;
             } else if (echoLeft) {
                 radar.echoLeft();
+                logger.info("\n ECHO LEFT \n");
                 echo = false;
                 checkLeft = true;
                 echoLeft = false;

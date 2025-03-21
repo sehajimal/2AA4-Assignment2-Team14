@@ -55,7 +55,8 @@ public class DroneLimits {
     public boolean insufficientBattery() {
         //logger.info("IN BATTERY CHECK");
         if (this.drone.getBatteryLevel() < ((double) this.drone.getInitialBatteryLevel() * 0.007)) {
-            //logger.info("BATTERY CHECK: INSUFFICIENT");
+            logger.info("BATTERY CHECK: INSUFFICIENT \n");
+            logger.info(this.drone.getBatteryLevel());
             return true;
         }
         //logger.info("BATTERY CHECK: SUFFICIENT");

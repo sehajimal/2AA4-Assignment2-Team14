@@ -15,6 +15,7 @@ public class Explorer implements IExplorerRaid {
     private final Logger logger = LogManager.getLogger();
     private DroneController droneController;
     int i = 0;
+    boolean explorationComplete;
 
     @Override
     public void initialize(String s) {
@@ -30,6 +31,7 @@ public class Explorer implements IExplorerRaid {
         System.out.println(info);
 
         droneController = new DroneController(direction, batteryLevel);
+        explorationComplete = false;
 
         // initialize DroneController here (send in battery level and heading)
     }
@@ -50,6 +52,13 @@ public class Explorer implements IExplorerRaid {
 
         logger.info("** Decision: {}", decision.toString());
 
+        if (decision.has("action") && "stop".equals(decision.getString("action"))) {
+            // The decision was to stop
+            logger.info("\n DECISION IS TO STOP \n");
+            explorationComplete = true;
+        }
+        
+
         //logger.info("\n take decision \n");
 
         return decision.toString();
@@ -67,11 +76,18 @@ public class Explorer implements IExplorerRaid {
         logger.info("Additional information received: {}", extraInfo);
         logger.info("\n acknowledge results \n");
         droneController.setResult(response);
+        if (explorationComplete) {
+            String results = deliverFinalReport();
+            logger.info("The results are {}", results);
+            //deliverFinalReport();
+        }
+        logger.info("\n acknowledge results complete \n");
     }
 
     @Override
     public String deliverFinalReport() {
-        return "no creek found";
+        return droneController.getDiscoveries();
+        //return "no creek found";
     }
 
 }

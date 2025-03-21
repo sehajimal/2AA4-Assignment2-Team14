@@ -109,6 +109,10 @@ public class DroneController {
         return commandTracker.getLatestCommand(); 
     }
 
+    public String getDiscoveries() {
+        return this.report.getDiscoveries().toString();
+    }
+
     private void updatebattery() {
         if (latestResult != null) {
             int amount = latestResult.getInt("cost");

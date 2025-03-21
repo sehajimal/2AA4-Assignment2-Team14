@@ -2,7 +2,7 @@ package ca.mcmaster.se2aa4.island.teamXXX.Map;
 
 import org.json.JSONObject;
 
-import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
+//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;

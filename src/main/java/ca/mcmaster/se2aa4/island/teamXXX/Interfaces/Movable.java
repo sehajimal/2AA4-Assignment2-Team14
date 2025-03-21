@@ -23,5 +23,7 @@ public interface Movable {
     public Directions getHeading();
 
     public int getInitialBatteryLevel();
+
+    public boolean hasVisitedLocation();
     
 }

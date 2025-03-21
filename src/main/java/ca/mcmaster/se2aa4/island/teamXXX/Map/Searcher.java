@@ -5,11 +5,16 @@ import java.security.PKCS12Attribute;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 
 public class Searcher extends State {
+
+    private static final Logger logger = LogManager.getLogger(Searcher.class);
 
     // boooleans indicating whether to fly or scan on this iteration
     private boolean scan;
@@ -32,8 +37,11 @@ public class Searcher extends State {
     @Override
     public State getNextState(JSONObject response) {
 
+        //logger.info("\n IN SEARCHER \n");
+
         if (fly) {
             // ADD LOGIC TO CHECK FOR CREEKS OR SITES
+            logger.info("\n IN FLY \n");
 
             //! add logic to add to report if creek or site is found
             if (foundCreek(response)) {
@@ -46,20 +54,15 @@ public class Searcher extends State {
             if (foundSite(response)) {
                 String[] sites = getSites(response);
                 for (String site : sites) {
-                    addCreekToReport(site);
+                    addSiteToReport(site);
                 }
                 //return new State(this.drone, this.radar, this.report);
             }
-
-            // logic to break out of search state
-            // if (containsOcean(response) && onLand) {
-            //     return new TurnDrone(this.drone, this.radar, this.report);
-            // } else if (!containsOcean(response)) {
-            //     onLand = true;
-            // }
             if (inOcean(response) && foundLand) {
+                logger.info("\n TRANSITION \n");
                 return new TurnDrone(this.drone, this.radar, this.report);
             } else if (!inOcean(response) && !foundLand) {
+                logger.info("\n DONT TRANSITION YET \n");
                 foundLand = true;
             }
 
@@ -67,36 +70,52 @@ public class Searcher extends State {
             fly = false;
             scan = true;
         } else if (scan) {
-            radar.scan();
-            fly = true;
-            scan = false;
+            logger.info("\n IN SCAN \n");
+            if (drone.hasVisitedLocation()) {
+                drone.moveForward();
+                foundLand = true;
+                logger.info("\n HAS VISITED \n");
+            } else {
+                radar.scan();
+                fly = true;
+                scan = false;
+                logger.info("\n HAS NOT VISITED \n");
+            }
+            // radar.scan();
+            // fly = true;
+            // scan = false;
         }
 
         return this;
     }
 
-    private boolean containsOcean(JSONObject response) {
-        if (!response.has("extras")) return false;
+    // private boolean containsOcean(JSONObject response) {
+    //     if (!response.has("extras")) return false;
 
-        JSONObject extras = response.getJSONObject("extras");
-        if (!extras.has("biomes")) return false;
+    //     JSONObject extras = response.getJSONObject("extras");
+    //     if (!extras.has("biomes")) return false;
 
-        JSONArray biomes = extras.getJSONArray("biomes");
-        for (int i = 0; i < biomes.length(); i++) {
-            if (biomes.getString(i).equals("OCEAN")) {
-                return true;
-            }
-        }
-        return false;
-    }
+    //     JSONArray biomes = extras.getJSONArray("biomes");
+    //     for (int i = 0; i < biomes.length(); i++) {
+    //         if (biomes.getString(i).equals("OCEAN")) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     private boolean inOcean(JSONObject response) {
+
+        logger.info("\n IN CHECK OCEAN \n");
         if (!response.has("extras")) return false;
 
         JSONObject extras = response.optJSONObject("extras"); // Use optJSONObject to avoid exceptions
         if (extras == null || !extras.has("biomes")) return false;
 
+        //logger.info("\n BIOMES EXIST \n");
         JSONArray biomes = extras.optJSONArray("biomes"); // Use optJSONArray to avoid exceptions
+        //boolean result = biomes != null && biomes.length() == 1 && "OCEAN".equals(biomes.optString(0));
+        //logger.info(result);
         return biomes != null && biomes.length() == 1 && "OCEAN".equals(biomes.optString(0));
     }
 

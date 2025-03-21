@@ -7,6 +7,8 @@ import ca.mcmaster.se2aa4.island.teamXXX.Map.FindIsland;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Drone extends ExplorerSubject implements Movable {
 
@@ -16,6 +18,7 @@ public class Drone extends ExplorerSubject implements Movable {
     private Radar radar;
     private Directions heading;
     private Battery battery;
+    private Set<String> visitedLocations;
     private int x;
     private int y;
     private int costPerMove;
@@ -29,6 +32,7 @@ public class Drone extends ExplorerSubject implements Movable {
         x = 0;
         y = 0;
         this.heading = starting;
+        this.visitedLocations = new HashSet<>();
     }
 
     private void updateCoordinates() {
@@ -99,13 +103,15 @@ public class Drone extends ExplorerSubject implements Movable {
     //     stop();
     // }
 
-    public boolean shouldGoHome() {
-        if (this.battery.getBatteryLevel() < 50) {
-            return true;
+    @Override
+    public boolean hasVisitedLocation() {
+        String positionKey = x + "," + y; // unique key for (x, y)
+        if (visitedLocations.contains(positionKey)) {
+            return true; // already visited this location
         }
+        visitedLocations.add(positionKey); //add new location to the set
         return false;
     }
-
     
     @Override
     public int getBatteryLevel() {
