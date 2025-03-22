@@ -5,8 +5,8 @@ import org.json.JSONObject;
 
 public class Report {
     private static Report instance = null;
-    private JSONObject discoveries; // Store creeks, sites, etc.
-    private boolean isValid; // Initially false
+    private JSONObject discoveries; // stores creeks and sites (ids, x and y coords)
+    private boolean isValid; // indicates if report is viable (has at least one creek and site)
 
     private Report() {
         discoveries = new JSONObject();
@@ -69,4 +69,78 @@ public class Report {
     public boolean isValid() {
         return isValid;
     }
+
+    public String getClosestCreekToSite() {
+        // checks if at least one creek and site is in report
+        if (!isValid) {
+            return "Insufficient Data";
+        }
+
+        JSONArray creeks = getCreeks();
+        JSONArray sites = getSites();
+
+        JSONObject site = sites.getJSONObject(0);
+        int siteX = site.getInt("x");
+        int siteY = site.getInt("y");
+
+        String closestCreekId = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (int i = 0; i < creeks.length(); i++) {
+            JSONObject creek = creeks.getJSONObject(i);
+            int creekX = creek.getInt("x");
+            int creekY = creek.getInt("y");
+
+            // computing distance from creek to site
+            double distance = Math.sqrt(Math.pow(siteX - creekX, 2) + Math.pow(siteY - creekY, 2));
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestCreekId = creek.getString("id");
+            }
+        }
+
+        return closestCreekId;
+    }
+
+    public String presentDiscoveries() {
+        StringBuilder report = new StringBuilder();
+    
+        // Fetch discoveries
+        JSONArray creeks = getCreeks();
+        JSONArray sites = getSites();
+    
+        // Format creek information
+        report.append("Creeks Found: ");
+        if (creeks.length() == 0) {
+            report.append("Insufficient data\n");
+        } else {
+            report.append("\n");
+            for (int i = 0; i < creeks.length(); i++) {
+                JSONObject creek = creeks.getJSONObject(i);
+                report.append(String.format("  - ID: %s, X: %d, Y: %d\n",
+                        creek.getString("id"),
+                        creek.getInt("x"),
+                        creek.getInt("y")));
+            }
+        }
+    
+        // Format site information
+        report.append("Emergency Site: ");
+        if (sites.length() == 0) {
+            report.append("Insufficient data\n");
+        } else {
+            JSONObject site = sites.getJSONObject(0);
+            report.append(String.format("\n  - ID: %s, X: %d, Y: %d\n",
+                    site.getString("id"),
+                    site.getInt("x"),
+                    site.getInt("y")));
+        }
+
+        String closestCreek = getClosestCreekToSite();
+        report.append("Closest creek to site: ").append(closestCreek).append("\n");
+    
+        return report.toString();
+    }
+    
 }

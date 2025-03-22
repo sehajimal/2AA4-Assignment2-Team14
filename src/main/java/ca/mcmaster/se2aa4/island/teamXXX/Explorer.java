@@ -78,7 +78,7 @@ public class Explorer implements IExplorerRaid {
         droneController.setResult(response);
         if (explorationComplete) {
             String results = deliverFinalReport();
-            logger.info("The results are {}", results);
+            logger.info(results);
             //deliverFinalReport();
         }
         logger.info("\n acknowledge results complete \n");

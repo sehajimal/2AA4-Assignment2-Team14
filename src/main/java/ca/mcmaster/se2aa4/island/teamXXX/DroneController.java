@@ -110,7 +110,8 @@ public class DroneController {
     }
 
     public String getDiscoveries() {
-        return this.report.getDiscoveries().toString();
+        //return this.report.getDiscoveries().toString();
+        return this.report.presentDiscoveries();
     }
 
     private void updatebattery() {
