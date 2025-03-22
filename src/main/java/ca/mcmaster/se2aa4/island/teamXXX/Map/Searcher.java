@@ -15,14 +15,16 @@ import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 public class Searcher extends State {
 
     private static final Logger logger = LogManager.getLogger(Searcher.class);
+    private final Detector detector;
 
     // boooleans indicating whether to fly or scan on this iteration
     private boolean scan;
     private boolean fly;
+    private boolean leavingSearch;
 
     //  values used to check if the row or column checked has been visited, avoids looping on same path
-    Integer searchLength;
-    Integer alreadyVisited;
+    private Integer searchLength;
+    private Integer alreadyVisited;
 
     /*
      * bandaid fix for handling case where if at shore, drone gets stuck in turns
@@ -34,9 +36,12 @@ public class Searcher extends State {
     public Searcher(Movable drone, Radar radar, Report report) {
         super(drone, radar, report);
 
+        this.detector = new Detector();
+
         scan = true;
         fly = false;
         foundLand = false;
+        leavingSearch = false;
 
         searchLength = 0;
         alreadyVisited = 0;
@@ -46,6 +51,22 @@ public class Searcher extends State {
     public State getNextState(JSONObject response) {
 
         //logger.info("\n IN SEARCHER \n");
+
+        if (leavingSearch) {
+            if (detector.foundGround(response)) {
+                // currently above ocean but land ahead, fly to this land
+                return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
+            } else {
+                // checking threshold for if this row / column has already been searched
+                if (alreadyVisited > (int) (0.6 * searchLength)) {
+                    logger.info("ALREADY SEARCHED SECTION");
+                    // starting new search patter (looking for opposite axis)
+                    return new ReLocateIsland(this.drone, this.radar, this.report);
+                }
+                // turn the drone and continus current grid search
+                return new TurnDrone(this.drone, this.radar, this.report);
+            }
+        }
 
         if (fly) {
             // ADD LOGIC TO CHECK FOR CREEKS OR SITES
@@ -66,16 +87,19 @@ public class Searcher extends State {
                 //return new State(this.drone, this.radar, this.report);
             }
             if (inOcean(response) && foundLand) {
-                logger.info("\n TRANSITION \n");
-                drone.addTurnPoint();
-                logger.info("ALREADY VISITED CHECK");
-                logger.info(alreadyVisited);
-                logger.info(searchLength);
-                if (alreadyVisited > (int) (0.6 * searchLength)) {
-                    logger.info("ALREADY SEARCHED SECTION");
-                    return new ReLocateIsland(this.drone, this.radar, this.report);
-                }
-                return new TurnDrone(this.drone, this.radar, this.report);
+                leavingSearch = true;
+                radar.echoForward();
+                return this;
+                // logger.info("\n TRANSITION \n");
+                // drone.addTurnPoint();
+                // logger.info("ALREADY VISITED CHECK");
+                // logger.info(alreadyVisited);
+                // logger.info(searchLength);
+                // if (alreadyVisited > (int) (0.6 * searchLength)) {
+                //     logger.info("ALREADY SEARCHED SECTION");
+                //     return new ReLocateIsland(this.drone, this.radar, this.report);
+                // }
+                // return new TurnDrone(this.drone, this.radar, this.report);
             } else if (!inOcean(response) && !foundLand) {
                 logger.info("\n DONT TRANSITION YET \n");
                 foundLand = true;
