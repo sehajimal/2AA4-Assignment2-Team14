@@ -16,7 +16,7 @@ public class Battery {
 
     public void useBattery(int amount) {
         if (amount > batteryLevel) {
-            throw new IllegalArgumentException("Invalid amount");
+            throw new IllegalArgumentException("Invalid Amount of Battery");
         }
         batteryLevel -= amount;
     }

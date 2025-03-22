@@ -5,8 +5,9 @@ import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
+//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
 
 public class ReLocateIsland extends State {
 
@@ -18,13 +19,10 @@ public class ReLocateIsland extends State {
     private boolean echoLeft;
     private boolean checkLeft;
     private boolean checkRight;
-    //private boolean turnRight;
-    //private boolean turnleft;
     private boolean turnComplete;
     private boolean finalCheck;
-    Integer repositionCount;
     
-    public ReLocateIsland(Movable drone, Radar radar, Report report) {
+    public ReLocateIsland(Movable drone, ScanningSystem radar, Report report) {
 
         super(drone, radar, report);
 
@@ -35,28 +33,28 @@ public class ReLocateIsland extends State {
         echoLeft = false;
         checkRight = false;
         checkLeft = false;
-        //turnRight = false;
-        //turnleft = false;
         turnComplete = false;
         finalCheck = false;
-        repositionCount = 0;;
+
+        logger.info("** In Relocate Island State");
+
     }
 
+    /*
+     * no land ahead, echos left and right to try to detect land
+     * can be optimized if unsuccessful to echo forward and as long as not OUT_OF_RANGE in 0 then go forward and repeat proces
+     */
     @Override
     public State getNextState(JSONObject response) {
-
-        logger.info("IN RELOCATE ISLAND");
-
-        if (finalCheck) {
+        if (finalCheck) { // if ground found then go to it
             if (detector.foundGround(response)) {
                 return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
-            }
+            } // other wise repeat process in new orientation
             return new ReLocateIsland(this.drone, this.radar, this.report);
         }
 
         if (turnComplete) {
             radar.echoForward();
-            logger.info("ECHO FORWARD");
             finalCheck = true;
             turnComplete = false;
             return this;
@@ -65,8 +63,6 @@ public class ReLocateIsland extends State {
         if (checkRight) {
             if (detector.foundGround(response)) {
                 drone.turnRight();
-                logger.info("CHECK ECHO RIGHT");
-                //checkRight = false;
                 turnComplete = true;
                 return this;
             }
@@ -74,7 +70,6 @@ public class ReLocateIsland extends State {
         } else if (checkLeft) {
             if (detector.foundGround(response)) {
                 drone.turnLeft();
-                logger.info("CHECK ECHO LEFT");
                 turnComplete = true;
                 return this;
             }
@@ -84,36 +79,18 @@ public class ReLocateIsland extends State {
         if (echo) {
             if (echoRight) {
                 radar.echoRight();
-                logger.info("ECHO RIGHT");
                 checkRight = true;
                 echoLeft = true;
                 echoRight = false;
                 return this;
             } else if (echoLeft) {
                 radar.echoLeft();
-                logger.info("ECHO LEFT");
                 echo = false;
                 checkLeft = true;
                 echoLeft = false;
                 return this;
             }
-        } else {
-            //! hardcoded for now at 10 repositions
-            if (repositionCount > 0) {
-                drone.stop();
-                return this;
-            }
-            drone.moveForward();
-            echo = true;
-            echoRight = true;
-            echoLeft = false;
-            checkRight = false;
-            checkLeft = false;
-            turnComplete = false;
-            finalCheck = false;
-            repositionCount++;
-            return this;
-        }
+        } 
         drone.stop();
         return this;
     }

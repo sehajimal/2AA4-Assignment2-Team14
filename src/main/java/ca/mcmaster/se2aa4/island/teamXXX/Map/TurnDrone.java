@@ -2,10 +2,10 @@ package ca.mcmaster.se2aa4.island.teamXXX.Map;
 
 import org.json.JSONObject;
 
-//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
-import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
+//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
 
 import java.util.EnumSet;
 
@@ -25,7 +25,7 @@ public class TurnDrone extends State {
     boolean turnComplete;
     boolean checkGround;
 
-    public TurnDrone(Movable drone, Radar radar, Report report) {
+    public TurnDrone(Movable drone, ScanningSystem radar, Report report) {
         super(drone, radar, report);
 
         rightTurn = false;
@@ -33,63 +33,48 @@ public class TurnDrone extends State {
         turnComplete = false;
         checkGround = false;
 
-        EnumSet<Directions> searchDownOrRight = EnumSet.of(Directions.S, Directions.E);
-        EnumSet<Directions> searchUpOrLeft = EnumSet.of(Directions.N, Directions.W);
+        //EnumSet<Directions> searchDownOrRight = EnumSet.of(Directions.S, Directions.E);
+        //EnumSet<Directions> searchUpOrLeft = EnumSet.of(Directions.N, Directions.W);
 
-        logger.info("\n TURN DRONE \n");
+        logger.info("** In U-Turn State");
     }
 
     @Override
     public State getNextState(JSONObject response) {
-        logger.info("\n IN TURN DRONE \n");
-
-        logger.info(drone.getHeading());
-        logger.info(drone.getSearchDirection());
-        //logger.info(searchDownOrRight.contains(drone.getSearchDirection()));
-        //logger.info("\n MADE PASSED CHECK \n");
-        //
         if (checkGround) {
-            // if ground is there go toir
-            if (detector.foundGround(response)) {
+            if (detector.foundGround(response)) { // if ground is there go to it
                 return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
-            // otherwise search for ground again
-            } else {
+            } else { // otherwise search for ground again
                 return new ReturnToIsland(this.drone, this.radar, this.report);
             }
         } else if (turnComplete) {
-            // once turn is complete check if ground is in direction
+            // once turn is complete check if ground is in current heading
+            logger.info("** Turn Complete");
             checkGround = true;
             radar.echoForward();
             return this;
-            //return new Searcher(this.drone, this.radar, this.report);
-        } else if (rightTurn) {
+        } else if (rightTurn) { // second right turn
             drone.turnRight();
-            logger.info("\n SECOND RIGHT \n");
-            logger.info(drone.getHeading());
             turnComplete = true;
             return this;
-        } else if (leftTurn) {
+        } else if (leftTurn) { // second left turn
             drone.turnLeft();
-            logger.info("\n SECOND LEFT \n");
-            logger.info(drone.getHeading());
             turnComplete = true;
             return this;
-            //searchDownOrRight.contains(drone.getSearchDirection())
+        /*
+         * sequence below determines direction for U-Turn
+         * based on current grid search direction (left --> right, right --> left, up --> down, or down --> up)
+         * will decide correct direction for U-Turn and complete first turn (avoids going MIA)
+         */
         } else if (drone.getSearchDirection() == Directions.S || drone.getSearchDirection() == Directions.E) {
-            logger.info("\n CHECKING DOWN OR RIGHT \n");
             if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) {
                 rightTurn = true;
                 drone.turnRight();
-                logger.info("\n FIRST RIGHT \n");
-                logger.info(drone.getHeading());
                 return this;
             } else if (drone.getHeading() == Directions.S || drone.getHeading() == Directions.W) {
                 leftTurn = true;
                 drone.turnLeft();
-                logger.info("\n FIRST LEFT \n");
-                logger.info(drone.getHeading());
                 return this;
-                //searchUpOrLeft.contains(drone.getSearchDirection())
             }
         } else if (drone.getSearchDirection() == Directions.N || drone.getSearchDirection() == Directions.W) {
             if (drone.getHeading() == Directions.S || drone.getHeading() == Directions.W) {
@@ -106,19 +91,6 @@ public class TurnDrone extends State {
                 return this;
             }
         }
-        // else if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) {
-        //     rightTurn = true;
-        //     drone.turnRight();
-        //     logger.info("\n FIRST RIGHT \n");
-        //     logger.info(drone.getHeading());
-        //     return this;
-        // } else if (drone.getHeading() == Directions.S || drone.getHeading() == Directions.W) {
-        //     leftTurn = true;
-        //     drone.turnLeft();
-        //     logger.info("\n FIRST LEFT \n");
-        //     logger.info(drone.getHeading());
-        //     return this;
-        // } 
         else {
             throw new IllegalStateException("Invalid state reached");
         }

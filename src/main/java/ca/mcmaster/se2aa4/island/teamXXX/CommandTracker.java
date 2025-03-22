@@ -1,6 +1,5 @@
 package ca.mcmaster.se2aa4.island.teamXXX;
 
-import java.util.Queue;
 import java.util.Deque;
 import java.util.LinkedList;
 import org.json.JSONObject;

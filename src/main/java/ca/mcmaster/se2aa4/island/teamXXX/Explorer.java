@@ -4,8 +4,6 @@ import java.io.StringReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
-
 import eu.ace_design.island.bot.IExplorerRaid;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -30,37 +28,20 @@ public class Explorer implements IExplorerRaid {
         logger.info("Battery level is {}", batteryLevel);
         System.out.println(info);
 
+        // initializing drone controller to manage exploration
         droneController = new DroneController(direction, batteryLevel);
         explorationComplete = false;
-
-        // initialize DroneController here (send in battery level and heading)
     }
 
     @Override
     public String takeDecision() {
 
-        i++;
-
-        // if (i > 10000) {
-        //     JSONObject decision = droneController.stopExploration();
-        //     return decision.toString();
-        // }
-
-        logger.info("\n take decision \n");
+        logger.info("** Making Decision **");
 
         JSONObject decision = droneController.makeDecision();
 
         logger.info("** Decision: {}", decision.toString());
-
-        if (decision.has("action") && "stop".equals(decision.getString("action"))) {
-            // The decision was to stop
-            logger.info("\n DECISION IS TO STOP \n");
-            explorationComplete = true;
-        }
-        
-
-        //logger.info("\n take decision \n");
-
+   
         return decision.toString();
     }
 
@@ -74,20 +55,21 @@ public class Explorer implements IExplorerRaid {
         logger.info("The status of the drone is {}", status);
         JSONObject extraInfo = response.getJSONObject("extras");
         logger.info("Additional information received: {}", extraInfo);
-        logger.info("\n acknowledge results \n");
+
+        // sending response to drone controller to make smart decision
         droneController.setResult(response);
-        if (explorationComplete) {
+
+        // if exploration is comlete deliver report
+        if (this.droneController.isExplorationComplete()) {
             String results = deliverFinalReport();
             logger.info(results);
-            //deliverFinalReport();
         }
-        logger.info("\n acknowledge results complete \n");
     }
 
     @Override
     public String deliverFinalReport() {
+        // returns report
         return droneController.getDiscoveries();
-        //return "no creek found";
     }
 
 }

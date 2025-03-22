@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 /*
  * drone and radar will implement this
- * upon any decision
+ * updates upon any decision
  */
 public abstract class ExplorerSubject {
     

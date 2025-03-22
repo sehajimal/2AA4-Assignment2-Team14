@@ -2,8 +2,9 @@ package ca.mcmaster.se2aa4.island.teamXXX.Map;
 
 import org.json.JSONObject;
 
-import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
+//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 
 
@@ -21,7 +22,7 @@ public class ReturnToIsland extends State {
     private boolean turnComplete;
     private boolean finalCheck;
     
-    public ReturnToIsland(Movable drone, Radar radar, Report report) {
+    public ReturnToIsland(Movable drone, ScanningSystem radar, Report report) {
         super(drone, radar, report);
 
         this.detector = new Detector();
@@ -31,22 +32,30 @@ public class ReturnToIsland extends State {
         goRight = false;
         turnComplete = false;
         finalCheck = false;
+
+        logger.info("** In Return To Island State");
     }
 
+    /*
+     * after completing a grid search of island in one direction, will turn the drone to prepare it to
+     *  complete grid search in opposite direction, visiting and scanning the missed rows / columns to complete thorough search
+     */
     @Override
     public State getNextState(JSONObject response) {
-
-        logger.info("\n IN RETURN TO ISLAND \n");
-
         if (finalCheck) {
             if (detector.foundGround(response)) {
                 return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
             }
-            //return new FindIsland(this.drone, this.radar, this.report);
+            // if not facing ground need to re-locate island
             return new ReLocateIsland(this.drone, this.radar, this.report);
-            //drone.stop();
-            //return this;
         }
+
+        /*
+         * Turn Sequence:
+         * turn back towards island
+         * fly once to offset from previous grid search
+         * turn again in opposite direction to slot into unvisited row / column
+         */
 
         if (turnComplete) {
             radar.echoForward();
@@ -70,22 +79,8 @@ public class ReturnToIsland extends State {
             return this;
         }
 
-        // if (this.drone.getHeading() == Directions.S || this.drone.getHeading() == Directions.W) { //RFL
-        //     drone.turnRight();
-        //     goForward = true;
-        //     goLeft = true;
-        //     return this;
-        // } else if (this.drone.getHeading() == Directions.N || this.drone.getHeading() == Directions.E) { // LFR
-        //     drone.turnLeft();
-        //     goForward = true;
-        //     goRight = true;
-        //     return this;
-        // }
-
-        //--------------------------
-
+        // uses search direction and current heading to decide which directions the turn sequence should be in
         if (drone.getSearchDirection() == Directions.S || drone.getSearchDirection() == Directions.E) {
-            logger.info("\n CHECKING DOWN OR RIGHT \n");
             if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) { //LFR
                 drone.turnLeft();
                 goForward = true;

@@ -3,6 +3,9 @@ package ca.mcmaster.se2aa4.island.teamXXX.Drone;
 import org.json.JSONObject;
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 
+/*
+ * contains all possible decisions that can be made in JSON format
+ */
 public class Actions {
 
     public JSONObject fly() {

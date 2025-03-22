@@ -2,7 +2,7 @@ package ca.mcmaster.se2aa4.island.teamXXX;
 
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ExplorerSubject;
-import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+//import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,16 +24,15 @@ public class DroneController {
     private final Logger logger = LogManager.getLogger();
 
     private CommandTracker commandTracker;
-    //private Movable drone;
     private Drone drone;
     private Radar radar;
     private Report report;
-    //! can refactor to not hold the drone
     private DroneLimits limitations;
     private State currentState;
+    // result from most recent decision
     private JSONObject latestResult;
+    private boolean isExplorationComplete;
 
-    //! update constructor to initialize state to be findIsland
     public DroneController(String heading, int batteryLevel) {
         Directions eHeading = Directions.E;
         try {
@@ -42,75 +41,60 @@ public class DroneController {
             e.printStackTrace();
         }
 
-        //this.drone = new Drone(batteryLevel, heading);
         this.radar = new Radar(eHeading);
         this.drone = new Drone(batteryLevel, eHeading, this.radar);
         this.limitations = new DroneLimits(this.drone);
         this.report = Report.getInstance();
-        //start state
+        // start state
         this.currentState = new FindIsland(this.drone, this.radar, this.report);
 
+        // using observer to track all commands / decisions
         List<ExplorerSubject> subjects = Arrays.asList(this.drone, this.radar);
         this.commandTracker = new CommandTracker(subjects);
-        //logger.info("\n COMPLETED INITIALIZATION OF CONTROLLED \n");
+
+        isExplorationComplete = false;
+
+        logger.info("** Controller has been Initialized");
     }
 
     public JSONObject makeDecision() {
-        //logger.info("\n ENTERING makeDecision() \n");
-        // logger.info("\n DRONE AND RADAR HEADINGS");
-        // logger.info("\n");
-        // logger.info(drone.getHeading());
-        // logger.info("\n");
-        // logger.info(radar.getHeading());
-        // logger.info("\n");
-
         // updating battery
         updatebattery();
-        logger.info("Battery Level: ", this.drone.getBatteryLevel());
-        
-        // checking if exploration should stop
-        //logger.info("START BATTERY CHECK");
+        logger.info("** Battery Level: ", this.drone.getBatteryLevel());
+ 
+        // checking if there is sufficient battery to continue exploration
         if (limitations.insufficientBattery()) {
-            //logger.info("FAILED BATTERY CHECK");
+            setExplorationIsComplete(true);
             return stopExploration();
         }
 
-        //logger.info("PASSED BATTERY CHECK");
         State nextState;
         State currState;
 
         do {
-            //logger.info("\n IN DO WHILE LOOP: prevState={}, newState={} \n", prevState, newState);
-            
-            currState = this.currentState; // Store previous state
-            //logger.info("\n TEST1 \n");
+            currState = this.currentState; // store previous state
             nextState = this.currentState.getNextState(this.latestResult);
-            //logger.info("\n TEST2 \n");
+            this.currentState = nextState; // update state
+        } while (!(currState == nextState)); // state will either make decision or return next state,
+                                             // ensure decision is made before proceeding
         
-            //logger.info("\n GOT NEXT STATE: prevState={}, newState={} \n", currState, nextState);
-        
-            this.currentState = nextState; // Update state
-        
-            //logger.info("\n UPDATED STATE: prevState={}, newState={} \n", currState, nextState);
-        
-        } while (!(currState == nextState));
-        
-        //logger.info("\n TEST \n");
-        return commandTracker.getLatestCommand();
+        JSONObject decision = commandTracker.getLatestCommand();
+        // checks if decision is to stop
+        setExplorationIsComplete(decision);
+
+        return decision;
     }
 
     public void setResult(JSONObject result) {
         this.latestResult = result;
     }
 
-    //! make private
-    public JSONObject stopExploration() {
+    private JSONObject stopExploration() {
         this.drone.stop();
         return commandTracker.getLatestCommand(); 
     }
 
     public String getDiscoveries() {
-        //return this.report.getDiscoveries().toString();
         return this.report.presentDiscoveries();
     }
 
@@ -119,5 +103,21 @@ public class DroneController {
             int amount = latestResult.getInt("cost");
             this.drone.useBattery(amount);
         }
+    }
+
+    private void setExplorationIsComplete(JSONObject decision) {
+        if (decision.has("action") && "stop".equals(decision.getString("action"))) {
+            // The decision was to stop
+            logger.info("** Stopping Exlporation");
+            this.isExplorationComplete = true;
+        }
+    }
+
+    private void setExplorationIsComplete(boolean decisionIsToStop) {
+        this.isExplorationComplete = decisionIsToStop;
+    }
+
+    public boolean isExplorationComplete() {
+        return this.isExplorationComplete;
     }
 }

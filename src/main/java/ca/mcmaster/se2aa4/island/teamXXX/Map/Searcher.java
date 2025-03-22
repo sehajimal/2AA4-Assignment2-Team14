@@ -1,16 +1,15 @@
 package ca.mcmaster.se2aa4.island.teamXXX.Map;
 
-import java.security.PKCS12Attribute;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
-import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
+//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
+//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
 
 public class Searcher extends State {
 
@@ -22,10 +21,11 @@ public class Searcher extends State {
     private boolean fly;
     private boolean leavingSearch;
 
-    //  values used to check if the row or column checked has been visited, avoids looping on same path
+    // values used to check if the row or column checked has been visited, avoids looping on same path
     private Integer searchLength;
     private Integer alreadyVisited;
 
+    //! may not be needed anymore
     /*
      * bandaid fix for handling case where if at shore, drone gets stuck in turns
      * (switches between TurnDrone and Search), long term an additional state or 
@@ -33,7 +33,7 @@ public class Searcher extends State {
      */
     private boolean foundLand;
     
-    public Searcher(Movable drone, Radar radar, Report report) {
+    public Searcher(Movable drone, ScanningSystem radar, Report report) {
         super(drone, radar, report);
 
         this.detector = new Detector();
@@ -45,13 +45,18 @@ public class Searcher extends State {
 
         searchLength = 0;
         alreadyVisited = 0;
+
+        logger.info("** In Search State");
     }
 
+    //! refactor to remove foundLand boolean
+    /*
+     * iterates between flying forward and scanning trying to locate POIs
+     * takes a U turn or changes search pattern upon coming to end of island or
+     * if scanning an already scanned row or column
+     */
     @Override
     public State getNextState(JSONObject response) {
-
-        //logger.info("\n IN SEARCHER \n");
-
         if (leavingSearch) {
             if (detector.foundGround(response)) {
                 // currently above ocean but land ahead, fly to this land
@@ -59,49 +64,41 @@ public class Searcher extends State {
             } else {
                 // checking threshold for if this row / column has already been searched
                 if (alreadyVisited > (int) (0.6 * searchLength)) {
-                    logger.info("ALREADY SEARCHED SECTION");
-                    // starting new search patter (looking for opposite axis)
+                    logger.info("** Current Section has Already Been Searched");
+                    // starting new search pattern (looking for opposite axis)
                     return new ReLocateIsland(this.drone, this.radar, this.report);
                 }
-                // turn the drone and continus current grid search
+                // turn the drone and continue current grid search
                 return new TurnDrone(this.drone, this.radar, this.report);
             }
         }
 
         if (fly) {
-            // ADD LOGIC TO CHECK FOR CREEKS OR SITES
-            logger.info("\n IN FLY \n");
-
+            // checks if creek is found from previous scan
             if (foundCreek(response)) {
+                logger.info("** Creek Found!");
                 String[] creeks = getCreeks(response);
+                // adding creeks to report
                 for (String creek : creeks) {
                     addCreekToReport(creek);
                 }
-                //return new State(this.drone, this.radar, this.report);
             }
+            // checks if emergency site is found from previous scan
             if (foundSite(response)) {
+                logger.info("** Emergency Site Found!");
                 String[] sites = getSites(response);
+                // adding site to report
                 for (String site : sites) {
                     addSiteToReport(site);
                 }
-                //return new State(this.drone, this.radar, this.report);
             }
+            // checking if in ocean (condition for leacing search state)
             if (inOcean(response) && foundLand) {
                 leavingSearch = true;
+                // check if there is land further ahead
                 radar.echoForward();
                 return this;
-                // logger.info("\n TRANSITION \n");
-                // drone.addTurnPoint();
-                // logger.info("ALREADY VISITED CHECK");
-                // logger.info(alreadyVisited);
-                // logger.info(searchLength);
-                // if (alreadyVisited > (int) (0.6 * searchLength)) {
-                //     logger.info("ALREADY SEARCHED SECTION");
-                //     return new ReLocateIsland(this.drone, this.radar, this.report);
-                // }
-                // return new TurnDrone(this.drone, this.radar, this.report);
-            } else if (!inOcean(response) && !foundLand) {
-                logger.info("\n DONT TRANSITION YET \n");
+            } else if (!inOcean(response) && !foundLand) { // avoids turning immedietly after one turn is complete and still in ocean
                 foundLand = true;
             }
             drone.moveForward();
@@ -111,59 +108,34 @@ public class Searcher extends State {
         } else if (scan) {
             searchLength++;
 
-            // check if current location is known to be a turning point
+            // check if current location is known to be a turning point (saves energy from scan)
             if (drone.isTurnPoint()) {
-                //return new TurnDrone(this.drone, this.radar, this.report);
+                // change search strategies as this means that this column or row has already been visited
                 return new ReLocateIsland(this.drone, this.radar, this.report);
             }
-            logger.info("\n IN SCAN \n");
+            // avoids re-scanning already scanned location (saves energy from scan)
             if (drone.hasVisitedLocation()) {
                 alreadyVisited++;
                 drone.moveForward();
                 foundLand = true;
-                logger.info("\n HAS VISITED \n");
-                //alreadyVisited++;
-            } else {
+                logger.info("** Location has Already Been Scanned");
+            } else { // unvisited location
                 radar.scan();
                 fly = true;
                 scan = false;
-                logger.info("\n HAS NOT VISITED \n");
             }
-            // radar.scan();
-            // fly = true;
-            // scan = false;
         }
 
         return this;
     }
 
-    // private boolean containsOcean(JSONObject response) {
-    //     if (!response.has("extras")) return false;
-
-    //     JSONObject extras = response.getJSONObject("extras");
-    //     if (!extras.has("biomes")) return false;
-
-    //     JSONArray biomes = extras.getJSONArray("biomes");
-    //     for (int i = 0; i < biomes.length(); i++) {
-    //         if (biomes.getString(i).equals("OCEAN")) {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // }
-
     private boolean inOcean(JSONObject response) {
-
-        logger.info("\n IN CHECK OCEAN \n");
         if (!response.has("extras")) return false;
 
-        JSONObject extras = response.optJSONObject("extras"); // Use optJSONObject to avoid exceptions
+        JSONObject extras = response.optJSONObject("extras");
         if (extras == null || !extras.has("biomes")) return false;
 
-        //logger.info("\n BIOMES EXIST \n");
-        JSONArray biomes = extras.optJSONArray("biomes"); // Use optJSONArray to avoid exceptions
-        //boolean result = biomes != null && biomes.length() == 1 && "OCEAN".equals(biomes.optString(0));
-        //logger.info(result);
+        JSONArray biomes = extras.optJSONArray("biomes");
         return biomes != null && biomes.length() == 1 && "OCEAN".equals(biomes.optString(0));
     }
 
@@ -180,7 +152,6 @@ public class Searcher extends State {
         return false;
     }
 
-    //! need improvement for check (handling arrays of length > 1)
     private boolean foundSite(JSONObject response) {
         if (!response.has("extras")) return false;
 
@@ -204,7 +175,7 @@ public class Searcher extends State {
             }
             return creeks;
         }
-        return new String[0]; // Return an empty array if no creeks are found
+        return new String[0]; // return an empty array if no creeks are found
     }
     
     private String[] getSites(JSONObject response) {
@@ -217,21 +188,18 @@ public class Searcher extends State {
             }
             return sites;
         }
-        return new String[0]; // Return an empty array if no sites are found
+        return new String[0]; // return an empty array if no sites are found
     }
     
-
     public void addCreekToReport(String creekId) {
         int x = this.drone.getX();
         int y = this.drone.getY();
         this.report.addCreek(creekId, x, y);
     }
 
-    // Add a site to the report from the drone's coordinates
     public void addSiteToReport(String siteId) {
         int x = this.drone.getX();
         int y = this.drone.getY();
         this.report.addSite(siteId, x, y);
     }  
-
 }
