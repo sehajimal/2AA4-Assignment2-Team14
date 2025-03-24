@@ -39,7 +39,6 @@ public class Searcher extends State {
         logger.info("** In Search State");
     }
 
-    //! refactor to remove foundLand boolean
     /*
      * iterates between flying forward and scanning trying to locate POIs
      * takes a U turn or changes search pattern upon coming to end of island or
