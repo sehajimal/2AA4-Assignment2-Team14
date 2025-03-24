@@ -13,7 +13,7 @@ public class DroneControllerTest {
 
     @BeforeEach
     public void setUp() {
-        controller = new DroneController("EAST", 1000);
+        controller = new DroneController("E", 1000);
     }
 
     @Test
@@ -25,7 +25,7 @@ public class DroneControllerTest {
 
     @Test
     public void testStopWhenLowBattery() {
-        controller = new DroneController("EAST", 0); // force low battery
+        controller = new DroneController("E", 0); // force low battery
         JSONObject decision = controller.makeDecision();
         assertEquals("stop", decision.getString("action"));
         assertTrue(controller.isExplorationComplete());

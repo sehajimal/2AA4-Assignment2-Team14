@@ -17,7 +17,7 @@ public class ExplorerTest {
 
     @Test
     public void testInitialization() {
-        String input = "{\"heading\": \"EAST\", \"budget\": 8000}";
+        String input = "{\"heading\": \"E\", \"budget\": 8000}";
         explorer.initialize(input);
         String decision = explorer.takeDecision();
         assertNotNull(decision);
@@ -26,7 +26,7 @@ public class ExplorerTest {
 
     @Test
     public void testAcknowledgeResultsTriggersLogics() {
-        String input = "{\"heading\": \"EAST\", \"budget\": 8000}";
+        String input = "{\"heading\": \"E\", \"budget\": 8000}";
         explorer.initialize(input);
 
         // simulate a drone response
