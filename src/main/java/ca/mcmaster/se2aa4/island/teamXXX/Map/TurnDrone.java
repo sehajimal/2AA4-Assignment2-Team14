@@ -3,11 +3,8 @@ package ca.mcmaster.se2aa4.island.teamXXX.Map;
 import org.json.JSONObject;
 
 import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
-//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
-
-import java.util.EnumSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,24 +14,18 @@ public class TurnDrone extends State {
     private static final Logger logger = LogManager.getLogger(FindIsland.class);
     private final Detector detector = new Detector();
 
-    EnumSet<Directions> searchDownOrRight;
-    EnumSet<Directions> searchUpOrLeft;
-
     boolean rightTurn;
     boolean leftTurn;
     boolean turnComplete;
     boolean checkGround;
 
-    public TurnDrone(Movable drone, ScanningSystem radar, Report report) {
-        super(drone, radar, report);
+    public TurnDrone(Movable drone, ScanningSystem radar) {
+        super(drone, radar);
 
         rightTurn = false;
         leftTurn = false;
         turnComplete = false;
         checkGround = false;
-
-        //EnumSet<Directions> searchDownOrRight = EnumSet.of(Directions.S, Directions.E);
-        //EnumSet<Directions> searchUpOrLeft = EnumSet.of(Directions.N, Directions.W);
 
         logger.info("** In U-Turn State");
     }
@@ -43,9 +34,9 @@ public class TurnDrone extends State {
     public State getNextState(JSONObject response) {
         if (checkGround) {
             if (detector.foundGround(response)) { // if ground is there go to it
-                return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
+                return new GoToIsland(this.drone, this.radar, detector.getDistance(response));
             } else { // otherwise search for ground again
-                return new ReturnToIsland(this.drone, this.radar, this.report);
+                return new ReturnToIsland(this.drone, this.radar);
             }
         } else if (turnComplete) {
             // once turn is complete check if ground is in current heading

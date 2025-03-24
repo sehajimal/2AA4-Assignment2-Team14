@@ -24,7 +24,7 @@ public class Drone extends ExplorerSubject implements Movable {
     private Set<String> turnPoints;
     private int x;
     private int y;
-    private Actions actions = new Actions();
+    private Actions actions;
 
     //? remove tight coupling with Drone class later
     public Drone(Integer amount, Directions starting, ScanningSystem radar) {
@@ -36,6 +36,7 @@ public class Drone extends ExplorerSubject implements Movable {
         this.searchDirection = navigator.getRight(this.heading);
         this.visitedLocations = new HashSet<>();
         this.turnPoints = new HashSet<>();
+        this.actions = new Actions();
     }
 
     private void updateCoordinates() {

@@ -10,14 +10,16 @@ import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
 
 public class Radar extends ExplorerSubject implements ScanningSystem {
 
-    private Navigator navigator = new Navigator();
-    private Actions action = new Actions();
+    private Navigator navigator;
+    private Actions action;
     private Directions heading;
 
     //private static final Logger logger = LogManager.getLogger(Radar.class);
 
     public Radar(Directions heading) {
         this.heading = heading;
+        this.action = new Actions();
+        this.navigator = new Navigator();
     }
 
     @Override

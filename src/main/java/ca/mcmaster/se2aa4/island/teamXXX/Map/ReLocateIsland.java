@@ -22,9 +22,9 @@ public class ReLocateIsland extends State {
     private boolean turnComplete;
     private boolean finalCheck;
     
-    public ReLocateIsland(Movable drone, ScanningSystem radar, Report report) {
+    public ReLocateIsland(Movable drone, ScanningSystem radar) {
 
-        super(drone, radar, report);
+        super(drone, radar);
 
         this.detector = new Detector();
 
@@ -48,9 +48,9 @@ public class ReLocateIsland extends State {
     public State getNextState(JSONObject response) {
         if (finalCheck) { // if ground found then go to it
             if (detector.foundGround(response)) {
-                return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
+                return new GoToIsland(this.drone, this.radar, detector.getDistance(response));
             } // other wise repeat process in new orientation
-            return new ReLocateIsland(this.drone, this.radar, this.report);
+            return new ReLocateIsland(this.drone, this.radar);
         }
 
         if (turnComplete) {

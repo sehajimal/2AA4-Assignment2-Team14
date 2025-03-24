@@ -26,7 +26,6 @@ public class DroneController {
     private CommandTracker commandTracker;
     private Drone drone;
     private Radar radar;
-    private Report report;
     private DroneLimits limitations;
     private State currentState;
     // result from most recent decision
@@ -44,9 +43,8 @@ public class DroneController {
         this.radar = new Radar(eHeading);
         this.drone = new Drone(batteryLevel, eHeading, this.radar);
         this.limitations = new DroneLimits(this.drone, 50);
-        this.report = Report.getInstance();
         // start state
-        this.currentState = new FindIsland(this.drone, this.radar, this.report);
+        this.currentState = new FindIsland(this.drone, this.radar);
 
         // using observer to track all commands / decisions
         List<ExplorerSubject> subjects = Arrays.asList(this.drone, this.radar);
@@ -95,7 +93,7 @@ public class DroneController {
     }
 
     public String getDiscoveries() {
-        return this.report.presentDiscoveries();
+        return Report.getInstance().presentDiscoveries();
     }
 
     private void updatebattery() {

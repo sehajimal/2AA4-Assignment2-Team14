@@ -22,13 +22,13 @@ public class ReturnToIsland extends State {
     private boolean turnComplete;
     private boolean finalCheck;
     
-    public ReturnToIsland(Movable drone, ScanningSystem radar, Report report) {
-        super(drone, radar, report);
+    public ReturnToIsland(Movable drone, ScanningSystem radar) {
+        super(drone, radar);
 
         this.detector = new Detector();
 
         goForward = false;
-        goLeft= false;
+        goLeft = false;
         goRight = false;
         turnComplete = false;
         finalCheck = false;
@@ -44,10 +44,10 @@ public class ReturnToIsland extends State {
     public State getNextState(JSONObject response) {
         if (finalCheck) {
             if (detector.foundGround(response)) {
-                return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
+                return new GoToIsland(this.drone, this.radar, detector.getDistance(response));
             }
             // if not facing ground need to re-locate island
-            return new ReLocateIsland(this.drone, this.radar, this.report);
+            return new ReLocateIsland(this.drone, this.radar);
         }
 
         /*

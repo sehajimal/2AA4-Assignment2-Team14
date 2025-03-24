@@ -23,14 +23,13 @@ public class Searcher extends State {
     private Integer searchLength;
     private Integer alreadyVisited;
     
-    public Searcher(Movable drone, ScanningSystem radar, Report report) {
-        super(drone, radar, report);
+    public Searcher(Movable drone, ScanningSystem radar) {
+        super(drone, radar);
 
         this.detector = new Detector();
 
         scan = true;
         fly = false;
-        //foundLand = false;
         leavingSearch = false;
 
         searchLength = 0;
@@ -49,16 +48,16 @@ public class Searcher extends State {
         if (leavingSearch) {
             if (detector.foundGround(response)) {
                 // currently above ocean but land ahead, fly to this land
-                return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
+                return new GoToIsland(this.drone, this.radar, detector.getDistance(response));
             } else {
                 // checking threshold for if this row / column has already been searched
                 if (alreadyVisited > (int) (0.6 * searchLength)) {
                     logger.info("** Current Section has Already Been Searched");
                     // starting new search pattern (looking for opposite axis)
-                    return new ReLocateIsland(this.drone, this.radar, this.report);
+                    return new ReLocateIsland(this.drone, this.radar);
                 }
                 // turn the drone and continue current grid search
-                return new TurnDrone(this.drone, this.radar, this.report);
+                return new TurnDrone(this.drone, this.radar);
             }
         }
 
@@ -101,13 +100,12 @@ public class Searcher extends State {
             // check if current location is known to be a turning point (saves energy from scan)
             if (drone.isTurnPoint()) {
                 // change search strategies as this means that this column or row has already been visited
-                return new ReLocateIsland(this.drone, this.radar, this.report);
+                return new ReLocateIsland(this.drone, this.radar);
             }
             // avoids re-scanning already scanned location (saves energy from scan)
             if (drone.hasVisitedLocation()) {
                 alreadyVisited++;
                 drone.moveForward();
-                //foundLand = true;
                 logger.info("** Location has Already Been Scanned");
             } else { // unvisited location
                 radar.scan();
@@ -182,14 +180,15 @@ public class Searcher extends State {
     }
     
     public void addCreekToReport(String creekId) {
+        //Report report = Report.getInstance();
         int x = this.drone.getX();
         int y = this.drone.getY();
-        this.report.addCreek(creekId, x, y);
+        Report.getInstance().addCreek(creekId, x, y);
     }
 
     public void addSiteToReport(String siteId) {
         int x = this.drone.getX();
         int y = this.drone.getY();
-        this.report.addSite(siteId, x, y);
+        Report.getInstance().addSite(siteId, x, y);
     }  
 }

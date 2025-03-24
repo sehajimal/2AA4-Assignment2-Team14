@@ -10,14 +10,11 @@ public abstract class State {
 
     protected final Movable drone;
     protected final ScanningSystem radar;
-    protected Report report;
 
     // could have put Logger in this class to make it easier
-    //! tight coupling with Radar, can be improved (use interface)
-    public State(Movable drone, ScanningSystem radar, Report report) {
+    public State(Movable drone, ScanningSystem radar) {
         this.drone = drone;
         this.radar = radar;
-        this.report = report;
     }
 
     public abstract State getNextState(JSONObject response);

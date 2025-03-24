@@ -111,7 +111,7 @@ public class Report {
         JSONArray sites = getSites();
     
         // Format creek information
-        report.append("Creeks Found: ");
+        report.append("\nCreeks Found: ");
         if (creeks.length() == 0) {
             report.append("Insufficient data\n");
         } else {

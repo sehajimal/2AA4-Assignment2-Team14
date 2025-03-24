@@ -1,18 +1,12 @@
 package ca.mcmaster.se2aa4.island.teamXXX.Map;
 
-//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
-//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
-//import ca.mcmaster.se2aa4.island.teamXXX.Map.Report;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
 
-//import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
+import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 import org.json.JSONObject;
-//import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-//import org.json.JSONObject;
-
 
 public class FindIsland extends State {
     private static final Logger logger = LogManager.getLogger(FindIsland.class);
@@ -22,8 +16,8 @@ public class FindIsland extends State {
     private boolean turnLeftNext; 
     private boolean echo;
 
-    public FindIsland(Movable drone, ScanningSystem radar, Report report) {
-        super(drone, radar, report);
+    public FindIsland(Movable drone, ScanningSystem radar) {
+        super(drone, radar);
         this.turnRightNext = true;
         this.turnLeftNext = false;
         this.echo = false;
@@ -39,7 +33,7 @@ public class FindIsland extends State {
     public State getNextState(JSONObject response) {
         if (detector.foundGround(response)) {
             logger.info("** Ground has been Found: Going to Island");
-            return new GoToIsland(this.drone, this.radar, this.report, detector.getDistance(response));
+            return new GoToIsland(this.drone, this.radar, detector.getDistance(response));
         }
         if (echo) {
             radar.echoForward();
