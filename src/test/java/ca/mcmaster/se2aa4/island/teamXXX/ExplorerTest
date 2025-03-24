@@ -1,0 +1,42 @@
+package ca.mcmaster.se2aa4.island.teamXXX;
+
+import org.json.JSONObject;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class ExplorerTest {
+
+    private Explorer explorer;
+
+    @BeforeEach
+    public void setUp() {
+        explorer = new Explorer();
+    }
+
+    @Test
+    public void testInitialization() {
+        String input = "{\"heading\": \"EAST\", \"budget\": 8000}";
+        explorer.initialize(input);
+        String decision = explorer.takeDecision();
+        assertNotNull(decision);
+        assertTrue(decision.contains("action")); // basic check
+    }
+
+    @Test
+    public void testAcknowledgeResultsTriggersLogics() {
+        String input = "{\"heading\": \"EAST\", \"budget\": 8000}";
+        explorer.initialize(input);
+
+        // simulate a drone response
+        JSONObject result = new JSONObject();
+        result.put("cost", 5);
+        result.put("status", "OK");
+        result.put("extras", new JSONObject());
+
+        explorer.acknowledgeResults(result.toString());
+
+        assertNotNull(explorer.deliverFinalReport());
+    }
+} 
