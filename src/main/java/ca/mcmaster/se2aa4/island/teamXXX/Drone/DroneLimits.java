@@ -12,8 +12,12 @@ import ca.mcmaster.se2aa4.island.teamXXX.Enums.Directions;
 public class DroneLimits {
     
     private final Drone drone;
-    
-    // can be added in the future to store dimensions of map, currently avoids going MIA without using these coords
+    private Integer threshold;
+
+    /*
+     * can be added in the future to store dimensions of map, currently avoids going MIA without using these coords
+     * echo forward and right to get dimensions of radar range
+     */
     private int maxX;
     private int maxY;
     private int minX;
@@ -22,8 +26,9 @@ public class DroneLimits {
     private final Logger logger = LogManager.getLogger();
     private final Map<Directions, Directions> invalidMoves;
 
-    public DroneLimits(Drone drone) {
+    public DroneLimits(Drone drone, Integer threshold) {
         this.drone = drone;
+        this.threshold = threshold;
 
         this.invalidMoves = new EnumMap<>(Directions.class);
         this.invalidMoves.put(Directions.N, Directions.S);
@@ -40,7 +45,7 @@ public class DroneLimits {
     // indicates if drone must return to base now
     public boolean insufficientBattery() {
         // comfortable threshold for going home
-        if (this.drone.getBatteryLevel() < 50) {
+        if (this.drone.getBatteryLevel() < threshold) {
             logger.info("** Battery Check: Insuffiient **\n");
             logger.info(this.drone.getBatteryLevel());
             return true;

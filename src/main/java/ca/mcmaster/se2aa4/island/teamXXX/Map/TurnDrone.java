@@ -80,14 +80,10 @@ public class TurnDrone extends State {
             if (drone.getHeading() == Directions.S || drone.getHeading() == Directions.W) {
                 rightTurn = true;
                 drone.turnRight();
-                logger.info("\n FIRST RIGHT \n");
-                logger.info(drone.getHeading());
                 return this;
             } else if (drone.getHeading() == Directions.N || drone.getHeading() == Directions.E) {
                 leftTurn = true;
                 drone.turnLeft();
-                logger.info("\n FIRST LEFT \n");
-                logger.info(drone.getHeading());
                 return this;
             }
         }

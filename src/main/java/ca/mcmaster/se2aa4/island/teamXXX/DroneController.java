@@ -43,7 +43,7 @@ public class DroneController {
 
         this.radar = new Radar(eHeading);
         this.drone = new Drone(batteryLevel, eHeading, this.radar);
-        this.limitations = new DroneLimits(this.drone);
+        this.limitations = new DroneLimits(this.drone, 50);
         this.report = Report.getInstance();
         // start state
         this.currentState = new FindIsland(this.drone, this.radar, this.report);

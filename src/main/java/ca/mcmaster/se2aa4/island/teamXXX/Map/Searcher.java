@@ -6,8 +6,6 @@ import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Drone;
-//import ca.mcmaster.se2aa4.island.teamXXX.Drone.Radar;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.Movable;
 import ca.mcmaster.se2aa4.island.teamXXX.Interfaces.ScanningSystem;
 
@@ -24,14 +22,6 @@ public class Searcher extends State {
     // values used to check if the row or column checked has been visited, avoids looping on same path
     private Integer searchLength;
     private Integer alreadyVisited;
-
-    //! may not be needed anymore
-    /*
-     * bandaid fix for handling case where if at shore, drone gets stuck in turns
-     * (switches between TurnDrone and Search), long term an additional state or 
-     * more secure logic can be added
-     */
-    private boolean foundLand;
     
     public Searcher(Movable drone, ScanningSystem radar, Report report) {
         super(drone, radar, report);
@@ -40,7 +30,7 @@ public class Searcher extends State {
 
         scan = true;
         fly = false;
-        foundLand = false;
+        //foundLand = false;
         leavingSearch = false;
 
         searchLength = 0;
@@ -92,15 +82,16 @@ public class Searcher extends State {
                     addSiteToReport(site);
                 }
             }
+
             // checking if in ocean (condition for leacing search state)
-            if (inOcean(response) && foundLand) {
+            if (inOcean(response)) {
                 leavingSearch = true;
                 // check if there is land further ahead
                 radar.echoForward();
                 return this;
-            } else if (!inOcean(response) && !foundLand) { // avoids turning immedietly after one turn is complete and still in ocean
-                foundLand = true;
             }
+
+            // still on land, continue forward
             drone.moveForward();
             fly = false;
             scan = true;
@@ -117,7 +108,7 @@ public class Searcher extends State {
             if (drone.hasVisitedLocation()) {
                 alreadyVisited++;
                 drone.moveForward();
-                foundLand = true;
+                //foundLand = true;
                 logger.info("** Location has Already Been Scanned");
             } else { // unvisited location
                 radar.scan();
